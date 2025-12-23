@@ -35,6 +35,32 @@ def test_search_project_in_company(page: Page, configs: Config, login):
     expect(page.locator("ul li h3").filter(visible=True)).to_have_text(TARGET_PROJECT)
 
 
+def test_valid_project_search_in_company(page: Page, configs: Config, login):
+    valid_project_search = "Industrial"
+
+    search_by_project(page, valid_project_search)
+    page.wait_for_timeout(1000)
+
+    total_projects_number = page.locator("ul li h3").count()
+    search_result_projects_number = page.locator("ul li h3").filter(visible=True).count()
+
+    # Check each visible project's name contains the search line
+    for i in range(search_result_projects_number):
+        expect(page.locator("ul li h3").filter(visible=True).nth(i)).to_contain_text(valid_project_search)
+
+    # Check each not visible project's name doesn't contain the search line
+    for i in range(total_projects_number - search_result_projects_number):
+        expect(page.locator("ul li h3").filter(visible=False).nth(i)).not_to_contain_text(valid_project_search)
+
+
+def test_invalid_search_in_company(page: Page, configs: Config, login):
+    invalid_search = "lklfs;lfk"
+
+    search_by_project(page, invalid_search)
+
+    expect(page.locator("ul li h3").filter(visible=True)).to_have_count(0)
+
+
 def test_should_be_possible_open_free_project(page: Page, configs: Config, login):
     page.locator("#company_id").click()
     page.locator("#company_id").select_option("Free Projects")
@@ -46,7 +72,7 @@ def test_should_be_possible_open_free_project(page: Page, configs: Config, login
 
 
 def search_by_project(page: Page, target_project: str):
-    page.locator("#content-desktop #search").fill(target_project)
+    page.locator("#content-desktop #search").fill(target_project, force=True)
 
 
 def open_homepage(page: Page, configs: Config):
