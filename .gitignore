@@ -3,4 +3,3 @@
 .env
 .tests/__pycache__/
 *.pyc
-src/
