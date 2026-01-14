@@ -27,6 +27,6 @@ def test_login_valid(page: Page, configs: Config):
 
     login_page = LoginPage(page)
     login_page.is_loaded()
-    login_page.login(configs.email, configs.password)
+    login_page.login(configs.email, configs.password, remember_me=True)
 
     ProjectsPage(page).is_loaded()
