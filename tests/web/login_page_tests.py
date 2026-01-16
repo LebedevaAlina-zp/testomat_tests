@@ -1,5 +1,5 @@
 import faker
-from playwright.sync_api import Page
+from playwright.sync_api import Page, expect
 
 from conftest import Config
 from src.web.pages.home_page import HomePage
@@ -29,4 +29,5 @@ def test_login_valid(page: Page, configs: Config):
     login_page.is_loaded()
     login_page.login(configs.email, configs.password, remember_me=True)
 
+    expect(ProjectsPage(page).sign_in_flash_message).to_be_visible()
     ProjectsPage(page).is_loaded()
