@@ -1,17 +1,6 @@
-import pytest
 from playwright.sync_api import Page, expect
 
-from conftest import Config
-from src.web.pages.login_page import LoginPage
 from src.web.pages.projects_page import ProjectsPage
-
-
-@pytest.fixture(scope="function")
-def login(page: Page, configs: Config):
-    login_page = LoginPage(page)
-    login_page.open()
-    login_page.is_loaded()
-    login_page.login(configs.email, configs.password, remember_me=True)
 
 
 def test_valid_project_search(page: Page, login):
