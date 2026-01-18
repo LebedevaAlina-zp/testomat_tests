@@ -17,4 +17,5 @@ def test_create_new_project_positive(page: Page, login):
     (ProjectPage(page)
      .is_loaded()
      .verify_project_title_is(valid_project_title)
+     .readme_block_close_btn.click()
      )

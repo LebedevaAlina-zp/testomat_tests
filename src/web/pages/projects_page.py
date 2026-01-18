@@ -1,20 +1,20 @@
 from playwright.sync_api import Page, expect
 
-from src.web.components.header import Header
+from src.web.components.header_nav import HeaderNav
 from src.web.components.project_card import ProjectCard
-from src.web.pages.base_page import BasePage
 
 
-class ProjectsPage(BasePage):
+class ProjectsPage():
     def __init__(self, page: Page):
-        super().__init__(page)
+        self.page = page
+        self._root = self.page.locator("#content-desktop")
 
-        self.header = Header(page)
+        self.header = HeaderNav(page)
 
-        self.sign_in_flash_message = self.root.locator(".common-flash-success", has_text="Signed in successfully")
+        self.sign_in_flash_message = self._root.locator(".common-flash-success", has_text="Signed in successfully")
 
         # Page header (Projects header area)
-        self.page_header = self.root.locator(".common-page-header")
+        self.page_header = self._root.locator(".common-page-header")
 
         # Projects header elements
         self.company_selected = self.page_header.locator(".common-page-header-subtitle button")
@@ -24,9 +24,9 @@ class ProjectsPage(BasePage):
         self.grid_view_icon = self.view_switcher.locator("svg[data-icon='grid']")
         self.table_view_icon = self.view_switcher.locator("svg[data-icon='table']")
 
-        self.search_input = self.root.locator("#search")
+        self.search_input = self._root.locator("#search")
 
-        self.grid = self.root.locator("#grid")
+        self.grid = self._root.locator("#grid")
         self.project_cards = self.grid.locator("li")
 
     def open(self):

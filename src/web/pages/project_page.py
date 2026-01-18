@@ -2,10 +2,14 @@ from typing import Self
 
 from playwright.sync_api import Page, expect
 
+from src.web.components.side_bar import SideBar
+
 
 class ProjectPage():
     def __init__(self, page: Page):
         self.page = page
+
+        self.side_bar = SideBar(page)
 
         self.project_title = self.page.locator(".first h2")
 

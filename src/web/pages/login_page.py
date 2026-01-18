@@ -1,21 +1,20 @@
 from playwright.sync_api import Page, expect
 
-from src.web.pages.base_page import BasePage
 
-
-class LoginPage(BasePage):
+class LoginPage():
     def __init__(self, page: Page):
-        super().__init__(page)
+        self.page = page
+        self._root_container = self.page.locator("#content-desktop")
 
-        self.signup_href = self.root.locator("a", has_text="Sign Up")
+        self.signup_href = self._root_container.locator("a", has_text="Sign Up")
 
-        self.auth_with_google = self.root.locator(".button-auth", has_text="Google")
-        self.auth_with_github = self.root.locator(".button-auth", has_text="GitHub")
-        self.auth_with_sso = self.root.locator(".button-auth", has_text="SSO")
+        self.auth_with_google = self._root_container.locator(".button-auth", has_text="Google")
+        self.auth_with_github = self._root_container.locator(".button-auth", has_text="GitHub")
+        self.auth_with_sso = self._root_container.locator(".button-auth", has_text="SSO")
 
-        self.email_input = self.root.locator("#user_email")
-        self.password_input = self.root.locator("#user_password")
-        self.remember_me_checkbox = self.root.locator("#user_remember_me")
+        self.email_input = self._root_container.locator("#user_email")
+        self.password_input = self._root_container.locator("#user_password")
+        self.remember_me_checkbox = self._root_container.locator("#user_remember_me")
         self.signin_btn = page.get_by_role("button", name="Sign In")
 
 
@@ -43,4 +42,4 @@ class LoginPage(BasePage):
         self.signin_btn.click()
 
     def invalid_login_message_visible(self):
-        expect(self.root.get_by_text("Invalid Email or password.")).to_be_visible()
+        expect(self._root_container.get_by_text("Invalid Email or password.")).to_be_visible()
