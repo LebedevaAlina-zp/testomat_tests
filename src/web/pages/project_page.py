@@ -2,14 +2,14 @@ from typing import Self
 
 from playwright.sync_api import Page, expect
 
-from src.web.components.side_bar import SideBar
+from src.web.components.side_bar import SideBarNav
 
 
 class ProjectPage():
     def __init__(self, page: Page):
         self.page = page
 
-        self.side_bar = SideBar(page)
+        self.side_bar = SideBarNav(page)
 
         self.project_title = self.page.locator(".first h2")
 
@@ -21,6 +21,11 @@ class ProjectPage():
         self.input_new_suite_title = self.page.locator("[placeholder='First Suite']")
         self.add_suite_btn = self.page.get_by_role("button", name="Suite")
 
+    
+    def open(self, project_name: str) -> Self:
+        self.page.goto(f"/projects/{project_name}")
+        return self
+    
     def is_loaded(self) -> Self:
         expect(self.project_title).to_be_visible(timeout=20_000)
         expect(self.page.locator(".mainnav-menu")).to_be_visible(timeout=10_000)

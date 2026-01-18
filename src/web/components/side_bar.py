@@ -1,63 +1,105 @@
-from playwright.sync_api import Locator, Page
+from playwright.sync_api import Locator, Page, expect
+from typing import Self
+import re
 
 
-class SideBar():
+class SideBarNav():
     def __init__(self, page: Page):
         self.page = page
         self._menu_container = page.locator(".mainnav-menu")
 
-    @property
-    def toggle_button(self) -> Locator:
-        return self._menu_container.get_by_role("button")
+        self.toggle_button = self._menu_container.get_by_role("button")
+        self.tests_link = self._menu_container.get_by_role("link", name="Tests")
+        self.requirements_link = self._menu_container.get_by_role("link", name="Requirements")
+        self.runs_link = self._menu_container.get_by_role("link", name="Runs")
+        self.plans_link = self._menu_container.get_by_role("link", name="Plans")
+        self.steps_link = self._menu_container.get_by_role("link", name="Steps")
+        self.pulse_link = self._menu_container.get_by_role("link", name="Pulse")
+        self.imports_link = self._menu_container.get_by_role("link", name="Imports")
+        self.analytics_link = self._menu_container.get_by_role("link", name="Analytics")
+        self.branches_link = self._menu_container.get_by_role("link", name="Branches")
+        self.settings_link = self._menu_container.get_by_role("link", name="Settings")
+        self.help_link = self._menu_container.get_by_role("link", name="Help")
+        self.projects_link = self._menu_container.get_by_role("link", name="Projects")
+        self.profile_link = self._menu_container.get_by_role("link", name="Profile")
 
-    @property
-    def tests_link(self) -> Locator:
-        return self._menu_container.get_by_role("link", name="Tests")
+        self._links = {
+            "Tests": self.tests_link,
+            "Requirements": self.requirements_link,
+            "Runs": self.runs_link,
+            "Plans": self.plans_link,
+            "Steps": self.steps_link,
+            "Pulse": self.pulse_link,
+            "Imports": self.imports_link,
+            "Analytics": self.analytics_link,
+            "Branches": self.branches_link,
+            "Settings": self.settings_link,
+            "Help": self.help_link,
+            "Projects": self.projects_link,
+            "Profile": self.profile_link,
+        }
 
-    @property
-    def requirements_link(self) -> Locator:
-        return self._menu_container.get_by_role("link", name="Requirements")
+    def is_loaded(self) -> Self:
+        expect(self._menu_container).to_be_visible()
+        expect(self.toggle_button).to_be_visible()
+        return self
 
-    @property
-    def runs_link(self) -> Locator:
-        return self._menu_container.get_by_role("link", name="Runs")
+    def expect_tab_active(self, name: str):
+        expect(self._links[name]).to_have_attribute("class", re.compile(r"\bactive\b"))
+        return self
 
-    @property
-    def plans_link(self) -> Locator:
-        return self._menu_container.get_by_role("link", name="Plans")
+    def open_side_bar(self):
+        self.toggle_button.click()
+        return self
 
-    @property
-    def steps_link(self) -> Locator:
-        return self._menu_container.get_by_role("link", name="Steps")
+    def click_tests(self):
+        self.tests_link.click()
+        return self
 
-    @property
-    def pulse_link(self) -> Locator:
-        return self._menu_container.get_by_role("link", name="Pulse")
+    def click_requirements(self):
+        self.requirements_link.click()
+        return self
 
-    @property
-    def imports_link(self) -> Locator:
-        return self._menu_container.get_by_role("link", name="Imports")
+    def click_runs(self):
+        self.runs_link.click()
+        return self
 
-    @property
-    def analytics_link(self) -> Locator:
-        return self._menu_container.get_by_role("link", name="Analytics")
+    def click_plans(self):
+        self.plans_link.click()
+        return self
 
-    @property
-    def branches_link(self) -> Locator:
-        return self._menu_container.get_by_role("link", name="Branches")
+    def click_steps(self):
+        self.steps_link.click()
+        return self
 
-    @property
-    def settings_link(self) -> Locator:
-        return self._menu_container.get_by_role("link", name="Settings")
+    def click_pulse(self):
+        self.pulse_link.click()
+        return self
 
-    @property
-    def help_link(self) -> Locator:
-        return self._menu_container.get_by_role("link", name="Help")
+    def click_imports(self):
+        self.imports_link.click()
+        return self
 
-    @property
-    def projects_link(self) -> Locator:
-        return self._menu_container.get_by_role("link", name="Projects")
+    def click_analytics(self):
+        self.analytics_link.click()
+        return self
 
-    @property
-    def profile_link(self) -> Locator:
-        return self._menu_container.get_by_role("link", name="Profile")
+    def click_branches(self):
+        self.branches_link.click()
+        return self
+
+    def click_settings(self):
+        self.settings_link.click()
+        return self
+
+    def click_help(self):
+        self.help_link.click()
+        return self
+
+    def click_projects(self):
+        self.projects_link.click()
+        return self
+
+    def click_profile(self):
+        self.profile_link.click()
+        return self

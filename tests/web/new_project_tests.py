@@ -19,3 +19,14 @@ def test_create_new_project_positive(page: Page, login):
      .verify_project_title_is(valid_project_title)
      .readme_block_close_btn.click()
      )
+    
+def test_new_project_side_bar_navigation(page:Page, login):
+    ProjectPage(page).open("industrial-movies-tools")
+
+    (ProjectPage(page).side_bar
+     .is_loaded()
+     .open_side_bar()
+     .expect_tab_active("Tests")
+     .click_requirements()
+     .expect_tab_active("Requirements"))
+    
