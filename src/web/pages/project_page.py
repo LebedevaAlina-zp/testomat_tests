@@ -1,3 +1,5 @@
+from typing import Self
+
 from playwright.sync_api import Page, expect
 
 
@@ -15,7 +17,7 @@ class ProjectPage():
         self.input_new_suite_title = self.page.locator("[placeholder='First Suite']")
         self.add_suite_btn = self.page.get_by_role("button", name="Suite")
 
-    def is_loaded(self):
+    def is_loaded(self) -> Self:
         expect(self.project_title).to_be_visible(timeout=20_000)
         expect(self.page.locator(".mainnav-menu")).to_be_visible(timeout=10_000)
         expect(self.page.locator("#welcometotestomatio")).to_be_visible()
@@ -24,3 +26,8 @@ class ProjectPage():
         expect(self.readme_block_close_btn).to_be_visible()
         expect(self.input_new_suite_title).to_be_visible()
         expect(self.add_suite_btn).to_be_visible()
+        return self
+
+    def verify_project_title_is(self, expected_title) -> Self:
+        expect(self.project_title).to_have_text(expected_title)
+        return self
