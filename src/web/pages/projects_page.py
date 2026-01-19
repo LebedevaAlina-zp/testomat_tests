@@ -1,4 +1,6 @@
+from dataclasses import dataclass
 from typing import Self
+
 from playwright.sync_api import Page, expect
 
 from src.web.components.header_nav import HeaderNav
@@ -18,9 +20,9 @@ class ProjectsPage:
         self.page_header = self._root.locator(".common-page-header")
 
         # Projects header elements
-        self.company_selected = self.page_header.locator(".common-page-header-subtitle button")
-        self.company_dropdown = self.page_header.locator(".common-page-header-subtitle .dropdown-menu")
-        self.current_plan = self.page_header.locator(".common-page-header-title span")
+        self.company_dropdown = self.page_header.locator("#company_id")
+        self.current_subscription = self.page_header.locator(".tooltip-project-plan span")
+        self.create_company_btn = self.page_header.get_by_role("link", name="Create Company to Upgrade")
         self.view_switcher = self.page_header.locator(".common-page-header-icons")
         self.grid_view_icon = self.view_switcher.locator("svg[data-icon='grid']")
         self.table_view_icon = self.view_switcher.locator("svg[data-icon='table']")
@@ -55,4 +57,21 @@ class ProjectsPage:
         card = self.project_cards.filter(has_text=name).first
         ProjectCard(card).open()
         return self
-    
+
+    @property
+    def company_options(self) -> CompanyOptions:
+        return CompanyOptions(
+            qa_club_lviv="789",
+            free_projects=""
+        )
+
+    def select_company(self, company: CompanyOptions):
+        self.company_dropdown.click()
+        self.company_dropdown.select_option(company)
+        return self
+
+
+@dataclass
+class CompanyOptions:
+    qa_club_lviv: str
+    free_projects: str
