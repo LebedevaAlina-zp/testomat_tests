@@ -6,7 +6,7 @@ from playwright.sync_api import Page, expect
 from src.web.components.header_nav import HeaderNav
 
 
-class NewProjectPage():
+class NewProjectPage:
     def __init__(self, page: Page):
         self.page = page
         self._root = self.page.locator("#content-desktop")

@@ -1,10 +1,11 @@
+from typing import Self
 from playwright.sync_api import Page, expect
 
 from src.web.components.header_nav import HeaderNav
 from src.web.components.project_card import ProjectCard
 
 
-class ProjectsPage():
+class ProjectsPage:
     def __init__(self, page: Page):
         self.page = page
         self._root = self.page.locator("#content-desktop")
@@ -29,17 +30,20 @@ class ProjectsPage():
         self.grid = self._root.locator("#grid")
         self.project_cards = self.grid.locator("li")
 
-    def open(self):
+    def open(self) -> Self:
         self.page.goto("/")
+        return self
 
-    def is_loaded(self):
+    def is_loaded(self) -> Self:
         expect(self.header.dashboard_link).to_be_visible()
         expect(self.header.create_project_button).to_be_visible()
         expect(self.search_input).to_be_visible()
         expect(self.grid).to_be_visible()
+        return self
 
-    def search_project(self, name: str):
+    def search_project(self, name: str) -> Self:
         self.search_input.fill(name, force=True)
+        return self
 
     def get_projects(self) -> list[ProjectCard]:
         return [
@@ -47,6 +51,8 @@ class ProjectsPage():
             for card in self.project_cards.all()
         ]
 
-    def open_project_by_name(self, name: str):
+    def open_project_by_name(self, name: str) -> Self:
         card = self.project_cards.filter(has_text=name).first
         ProjectCard(card).open()
+        return self
+    

@@ -1,7 +1,8 @@
+from typing import Self
 from playwright.sync_api import Page, expect
 
 
-class LoginPage():
+class LoginPage:
     def __init__(self, page: Page):
         self.page = page
         self._root_container = self.page.locator("#content-desktop")
@@ -18,10 +19,11 @@ class LoginPage():
         self.signin_btn = page.get_by_role("button", name="Sign In")
 
 
-    def open(self):
+    def open(self) -> Self:
         self.page.goto("/users/sign_in")
+        return self
 
-    def is_loaded(self):
+    def is_loaded(self) -> Self:
         expect(self.signup_href).to_be_visible(timeout=10000)
         expect(self.auth_with_google).to_be_visible
         expect(self.auth_with_github).to_be_visible()
@@ -31,8 +33,9 @@ class LoginPage():
         expect(self.password_input).to_be_visible()
         expect(self.remember_me_checkbox).to_be_visible()
         expect(self.signin_btn).to_be_visible()
+        return self
 
-    def login(self, email: str, password: str, remember_me: bool = False):
+    def login(self, email: str, password: str, remember_me: bool = False) -> Self:
         self.email_input.fill(email)
         self.password_input.fill(password)
 
@@ -40,6 +43,9 @@ class LoginPage():
             self.remember_me_checkbox.check()
 
         self.signin_btn.click()
+        return self
 
-    def invalid_login_message_visible(self):
+    def invalid_login_message_visible(self) -> Self:
         expect(self._root_container.get_by_text("Invalid Email or password.")).to_be_visible()
+        return self
+    
