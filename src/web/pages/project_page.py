@@ -1,3 +1,4 @@
+import re
 from typing import Self
 
 from playwright.sync_api import Page, expect
@@ -23,7 +24,11 @@ class ProjectPage:
 
     
     def open(self, project_name: str) -> Self:
-        self.page.goto(f"/projects/{project_name}")
+        """ Acceptable project_name:
+                project title (e.g. "Grocery & Shoes")
+                or slug (e.g. "grocery-shoes") """
+        slug = re.sub(r"[^a-zA-Z0-9]+", "-", project_name)
+        self.page.goto(f"/projects/{slug}")
         return self
     
     def is_loaded(self) -> Self:

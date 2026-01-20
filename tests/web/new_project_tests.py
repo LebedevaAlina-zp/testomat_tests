@@ -21,8 +21,8 @@ def test_create_new_project_positive(page: Page, login):
      )
     
 def test_new_project_side_bar_navigation(page:Page, login, app: Application):
-    target_project_crowl_name = "industrial-movies-tools"
-    app.project_page.open(target_project_crowl_name)
+    target_project_name = "Grocery, Outdoors & Shoes"
+    app.project_page.open(target_project_name)
 
     (app.project_page.side_bar
      .is_loaded()
