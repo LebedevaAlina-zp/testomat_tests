@@ -5,8 +5,8 @@ import pytest
 from dotenv import load_dotenv
 from playwright.sync_api import Page
 
-from src.web.pages.login_page import LoginPage
 from src.web.pages.application import Application
+from src.web.pages.login_page import LoginPage
 
 load_dotenv()
 
@@ -40,3 +40,27 @@ def login(page: Page, configs: Config):
 @pytest.fixture(scope="function")
 def app(page: Page) -> Application:
     return Application(page)
+
+
+@pytest.fixture(scope="session")
+def browser_type_launch_args(browser_type_launch_args: dict) -> dict:
+    return {
+        **browser_type_launch_args,
+        # "channel": "chrome",
+        # "headless": False,
+        "slow_mo": 0,
+        "timeout": 60000,
+    }
+
+
+@pytest.fixture(scope="session")
+def browser_context_args(browser_context_args: dict) -> dict:
+    return {
+        **browser_context_args,
+        "base_url": "https://app.testomat.io",
+        "viewport": {"width": 1540, "height": 728},
+        "locale": "uk-UA",
+        "timezone_id": "Europe/Kyiv",
+        "record_video_dir": "videos/",
+        "permissions": ["geolocation"],
+    }
