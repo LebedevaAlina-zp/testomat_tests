@@ -1,9 +1,12 @@
+import pytest
 from faker.proxy import Faker
 from playwright.sync_api import expect
 
 from src.web.pages.application import Application
 
 
+@pytest.mark.smoke
+@pytest.mark.web
 def test_valid_project_search(app: Application, login):
     valid_project_search = "Industrial"
 
@@ -20,6 +23,8 @@ def test_valid_project_search(app: Application, login):
             expect(project.card).not_to_be_visible()
 
 
+@pytest.mark.regression
+@pytest.mark.web
 def test_invalid_project_search(app:Application, login):
     invalid_project_search = Faker().password(length=6)  # "lklfs;lfk"
 
@@ -31,6 +36,8 @@ def test_invalid_project_search(app:Application, login):
     expect(app.projects_page.project_cards.filter(visible=True)).to_have_count(0)
 
 
+@pytest.mark.regression
+@pytest.mark.web
 def test_projects_company_switch(app: Application, login):
     default_company = "QA Club Lviv"
     default_subscription = "Enterprise plan"

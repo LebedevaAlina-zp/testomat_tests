@@ -1,3 +1,4 @@
+import pytest
 from faker import Faker
 from playwright.sync_api import expect
 
@@ -5,6 +6,8 @@ from conftest import Config
 from src.web.pages.application import Application
 
 
+@pytest.mark.smoke
+@pytest.mark.web
 def test_login_invalid(app: Application, configs: Config):
     (app.home_page.open()
      .is_loaded()
@@ -16,6 +19,8 @@ def test_login_invalid(app: Application, configs: Config):
     )
 
 
+@pytest.mark.smoke
+@pytest.mark.web
 def test_login_valid(app: Application, configs: Config):
     (app.home_page.open()
      .is_loaded()
