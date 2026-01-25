@@ -65,9 +65,20 @@ class ProjectsPage:
             free_projects=""
         )
 
+    def expect_selected_company(self, name: str) -> Self:
+        expect(self.company_dropdown.locator("option:checked")).to_have_text(name)
+        return self
+
+    def expect_current_subscription(self, name: str) -> Self:
+        expect(self.current_subscription).to_have_text(name)
+
     def select_company(self, company: CompanyOptions):
         self.company_dropdown.click()
         self.company_dropdown.select_option(company)
+        return self
+
+    def is_sign_in_successful_message_visible(self) -> Self:
+        expect(self.sign_in_flash_message).to_be_visible()
         return self
 
 

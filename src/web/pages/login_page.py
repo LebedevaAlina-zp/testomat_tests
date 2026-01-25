@@ -1,4 +1,5 @@
 from typing import Self
+
 from playwright.sync_api import Page, expect
 
 
@@ -45,7 +46,7 @@ class LoginPage:
         self.signin_btn.click()
         return self
 
-    def invalid_login_message_visible(self) -> Self:
+    def is_invalid_login_message_visible(self) -> Self:
         expect(self._root_container.get_by_text("Invalid Email or password.")).to_be_visible()
         return self
     

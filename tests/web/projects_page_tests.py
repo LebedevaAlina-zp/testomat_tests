@@ -43,15 +43,16 @@ def test_projects_company_switch(logged_app):
     free_subscription = "free plan"
 
     projects_page = logged_app.projects_page
-    (projects_page.open()
-     .is_loaded()
-     )
 
-    expect(projects_page.company_dropdown.locator("option:checked")).to_have_text(default_company)
-    expect(projects_page.current_subscription).to_have_text(default_subscription)
+    projects_page.open()
+    projects_page.is_loaded()
+
+    projects_page.expect_selected_company(default_company)
+    projects_page.expect_current_subscription(default_subscription)
 
     projects_page.select_company(projects_page.company_options.free_projects)
 
-    expect(projects_page.company_dropdown.locator("option:checked")).to_have_text(free_projects_company)
-    expect(projects_page.current_subscription).to_have_text(free_subscription)
+    projects_page.expect_selected_company(free_projects_company)
+    projects_page.expect_current_subscription(free_subscription)
+
     expect(projects_page.create_company_btn).to_be_visible()

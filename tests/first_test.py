@@ -13,6 +13,7 @@ def login(page: Page, configs: Config):
     login_user(page, email=configs.email, password=configs.password)
 
 
+@pytest.mark.skip(reason="pytest-playwright uninstalled for main tests amount")
 def test_sign_in_with_invalid_creds(page: Page, configs: Config):
     page.goto(configs.base_url)
 
@@ -28,6 +29,7 @@ def test_sign_in_with_invalid_creds(page: Page, configs: Config):
     expect(page.locator("#content-desktop .common-flash-info-right")).to_have_text("Invalid Email or password.")
 
 
+@pytest.mark.skip(reason="pytest-playwright uninstalled for main tests amount")
 def test_search_project_in_company(page: Page, configs: Config, login):
     search_by_project(page, TARGET_PROJECT)
 
@@ -35,6 +37,7 @@ def test_search_project_in_company(page: Page, configs: Config, login):
     expect(page.locator("ul li h3").filter(visible=True)).to_have_text(TARGET_PROJECT)
 
 
+@pytest.mark.skip(reason="pytest-playwright uninstalled for main tests amount")
 def test_valid_project_search_in_company(page: Page, configs: Config, login):
     valid_project_search = "Industrial"
 
@@ -53,6 +56,7 @@ def test_valid_project_search_in_company(page: Page, configs: Config, login):
         expect(page.locator("ul li h3").filter(visible=False).nth(i)).not_to_contain_text(valid_project_search)
 
 
+@pytest.mark.skip(reason="pytest-playwright uninstalled for main tests amount")
 def test_invalid_search_in_company(page: Page, configs: Config, login):
     invalid_search = "lklfs;lfk"
 
@@ -61,6 +65,7 @@ def test_invalid_search_in_company(page: Page, configs: Config, login):
     expect(page.locator("ul li h3").filter(visible=True)).to_have_count(0)
 
 
+@pytest.mark.skip(reason="pytest-playwright uninstalled for main tests amount")
 def test_should_be_possible_open_free_project(page: Page, configs: Config, login):
     page.locator("#company_id").click()
     page.locator("#company_id").select_option("Free Projects")

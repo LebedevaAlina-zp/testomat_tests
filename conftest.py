@@ -69,20 +69,20 @@ def browser_context(browser: Browser):
 
 
 @pytest.fixture(scope="module")
-def shared_browser(browser_context: BrowserContext) -> Page:
+def shared_page(browser_context: BrowserContext):
     page = browser_context.new_page()
     yield page
     page.close()
 
 
 @pytest.fixture(scope="function")
-def shared_app(shared_browser) -> Application:
-    yield Application(shared_browser)
-    clear_browser_data(shared_browser.context)
+def app(shared_page):
+    yield Application(shared_page)
+    clear_browser_data(shared_page.context)
 
 
 @pytest.fixture(scope="session")
-def logged_context(browser: Browser, configs: Config) -> BrowserContext:
+def logged_context(browser: Browser, configs: Config):
     context = browser.new_context(**CONTEXT_ARGS)
     page = context.new_page()
     login_page = LoginPage(page)
@@ -95,7 +95,7 @@ def logged_context(browser: Browser, configs: Config) -> BrowserContext:
 
 
 @pytest.fixture(scope="function")
-def logged_app(logged_context: BrowserContext, configs: Config) -> Application:
+def logged_app(logged_context: BrowserContext, configs: Config):
     page = logged_context.new_page()
     yield Application(page)
     page.close()

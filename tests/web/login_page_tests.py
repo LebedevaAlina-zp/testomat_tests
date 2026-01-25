@@ -1,6 +1,5 @@
 import pytest
 from faker import Faker
-from playwright.sync_api import expect
 
 from conftest import Config
 from src.web.pages.application import Application
@@ -41,25 +40,25 @@ invalid_login_test_data = [
 @pytest.mark.web
 @pytest.mark.temporary
 @pytest.mark.parametrize("invalid_email, invalid_password", invalid_login_test_data)
-def test_login_invalid(shared_app: Application, invalid_email, invalid_password):
-    (shared_app.login_page.open()
+def test_login_invalid(app: Application, invalid_email, invalid_password):
+    (app.login_page.open()
      .is_loaded()
      .login(invalid_email, invalid_password)
-     .invalid_login_message_visible()
-    )
+     .is_invalid_login_message_visible()
+     )
 
 
 @pytest.mark.smoke
 @pytest.mark.web
-def test_login_valid(shared_app: Application, configs: Config):
-    (shared_app.home_page.open()
+def test_login_valid(app: Application, configs: Config):
+    (app.home_page.open()
      .is_loaded()
      .click_login_button()
      )
 
-    (shared_app.login_page.is_loaded()
-    .login(configs.email, configs.password, remember_me=True)
-    )
+    (app.login_page.is_loaded()
+     .login(configs.email, configs.password, remember_me=True)
+     )
 
-    expect(shared_app.projects_page.sign_in_flash_message).to_be_visible()
-    shared_app.projects_page.is_loaded()
+    (app.projects_page.is_sign_in_successful_message_visible()
+     .is_loaded())
