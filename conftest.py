@@ -89,6 +89,7 @@ def logged_context(browser: Browser, configs: Config) -> BrowserContext:
     login_page.open()
     login_page.is_loaded()
     login_page.login(configs.email, configs.password, remember_me=True)
+    page.close()
     yield context
     context.close()
 

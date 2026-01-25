@@ -2,21 +2,19 @@ import pytest
 from faker.proxy import Faker
 from playwright.sync_api import expect
 
-from src.web.pages.application import Application
-
 
 @pytest.mark.smoke
 @pytest.mark.web
-def test_valid_project_search(app: Application, login):
+def test_valid_project_search(logged_app):
     valid_project_search = "Industrial"
 
-    (app.projects_page.open()
+    (logged_app.projects_page.open()
      .is_loaded()
      .search_project(valid_project_search)
     )
 
     # Check that only projects which contain the search line are visible
-    for project in app.projects_page.get_projects():
+    for project in logged_app.projects_page.get_projects():
         if valid_project_search in project.title.text_content():
             expect(project.card).to_be_visible()
         else:
@@ -25,26 +23,26 @@ def test_valid_project_search(app: Application, login):
 
 @pytest.mark.regression
 @pytest.mark.web
-def test_invalid_project_search(app:Application, login):
+def test_invalid_project_search(logged_app):
     invalid_project_search = Faker().password(length=6)  # "lklfs;lfk"
 
-    (app.projects_page.open()
+    (logged_app.projects_page.open()
      .is_loaded()
      .search_project(invalid_project_search)
     )
 
-    expect(app.projects_page.project_cards.filter(visible=True)).to_have_count(0)
+    expect(logged_app.projects_page.project_cards.filter(visible=True)).to_have_count(0)
 
 
 @pytest.mark.regression
 @pytest.mark.web
-def test_projects_company_switch(app: Application, login):
+def test_projects_company_switch(logged_app):
     default_company = "QA Club Lviv"
     default_subscription = "Enterprise plan"
     free_projects_company = "Free Projects"
     free_subscription = "free plan"
 
-    projects_page = app.projects_page
+    projects_page = logged_app.projects_page
     (projects_page.open()
      .is_loaded()
      )
