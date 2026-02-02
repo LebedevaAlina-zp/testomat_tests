@@ -3,7 +3,7 @@ from typing import Self
 
 from playwright.sync_api import Page, expect
 
-from src.web.components.side_bar_nav import SideBarNav
+from src.web.components import SideBarNav
 
 
 class ProjectPage:

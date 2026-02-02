@@ -2,9 +2,10 @@ import pytest
 from faker import Faker
 from playwright.sync_api import Page, expect
 
+
 TARGET_PROJECT = "Industrial & Jewelry"
 
-from conftest import Config
+from tests.conftest import Config
 
 
 @pytest.fixture(scope="function")

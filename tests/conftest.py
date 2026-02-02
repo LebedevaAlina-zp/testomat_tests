@@ -5,8 +5,8 @@ import pytest
 from dotenv import load_dotenv
 from playwright.sync_api import sync_playwright, Browser, BrowserContext
 
-from src.web.pages.application import Application
-from src.web.pages.login_page import LoginPage
+from src.web import Application
+from src.web.pages import LoginPage
 
 load_dotenv()
 
@@ -15,6 +15,7 @@ BROWSER_LAUNCH_ARGS = {
     "headless": False,
     "slow_mo": 0,
     "timeout": 120000,
+    # "traces_dir": "test-result/traces"
 }
 
 CONTEXT_ARGS = {

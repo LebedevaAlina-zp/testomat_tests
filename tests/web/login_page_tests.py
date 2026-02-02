@@ -1,8 +1,8 @@
 import pytest
 from faker import Faker
 
-from conftest import Config
-from src.web.pages.application import Application
+from tests.conftest import Config
+from src.web import Application
 
 fake = Faker()
 
@@ -36,9 +36,7 @@ invalid_login_test_data = [
 ]
 
 
-@pytest.mark.smoke
 @pytest.mark.web
-@pytest.mark.temporary
 @pytest.mark.parametrize("invalid_email, invalid_password", invalid_login_test_data)
 def test_login_invalid(app: Application, invalid_email, invalid_password):
     (app.login_page.open()

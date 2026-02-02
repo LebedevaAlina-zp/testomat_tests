@@ -1,7 +1,7 @@
 import pytest
 from faker import Faker
 
-from src.web.pages.new_project_page import ProjectType
+from src.web.pages import ProjectType
 
 
 @pytest.mark.smoke

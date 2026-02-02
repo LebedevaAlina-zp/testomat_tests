@@ -3,7 +3,7 @@ from typing import Self
 
 from playwright.sync_api import Page, expect
 
-from src.web.components.header_nav import HeaderNav
+from src.web.components import HeaderNav
 
 
 class NewProjectPage:
