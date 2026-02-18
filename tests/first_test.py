@@ -2,10 +2,9 @@ import pytest
 from faker import Faker
 from playwright.sync_api import Page, expect
 
+from tests.conftest import Config
 
 TARGET_PROJECT = "Industrial & Jewelry"
-
-from tests.conftest import Config
 
 
 @pytest.fixture(scope="function")
@@ -18,9 +17,9 @@ def login(page: Page, configs: Config):
 def test_sign_in_with_invalid_creds(page: Page, configs: Config):
     page.goto(configs.base_url)
 
-    expect(page.get_by_text('Log in', exact=True)).to_be_visible()
+    expect(page.get_by_text("Log in", exact=True)).to_be_visible()
 
-    page.get_by_text('Log in', exact=True).click()
+    page.get_by_text("Log in", exact=True).click()
     invalid_password = Faker().password(length=10)
 
     page.locator("#content-desktop #user_email").fill(configs.email)

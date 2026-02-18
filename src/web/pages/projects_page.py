@@ -6,6 +6,12 @@ from playwright.sync_api import Page, expect
 from src.web.components import HeaderNav, ProjectCard
 
 
+@dataclass
+class CompanyOptions:
+    qa_club_lviv: str
+    free_projects: str
+
+
 class ProjectsPage:
     def __init__(self, page: Page):
         self.page = page
@@ -47,10 +53,7 @@ class ProjectsPage:
         return self
 
     def get_projects(self) -> list[ProjectCard]:
-        return [
-            ProjectCard(card)
-            for card in self.project_cards.all()
-        ]
+        return [ProjectCard(card) for card in self.project_cards.all()]
 
     def open_project_by_name(self, name: str) -> Self:
         card = self.project_cards.filter(has_text=name).first
@@ -59,10 +62,7 @@ class ProjectsPage:
 
     @property
     def company_options(self) -> CompanyOptions:
-        return CompanyOptions(
-            qa_club_lviv="789",
-            free_projects=""
-        )
+        return CompanyOptions(qa_club_lviv="789", free_projects="")
 
     def expect_selected_company(self, name: str) -> Self:
         expect(self.company_dropdown.locator("option:checked")).to_have_text(name)
@@ -79,9 +79,3 @@ class ProjectsPage:
     def is_sign_in_successful_message_visible(self) -> Self:
         expect(self.sign_in_flash_message).to_be_visible()
         return self
-
-
-@dataclass
-class CompanyOptions:
-    qa_club_lviv: str
-    free_projects: str

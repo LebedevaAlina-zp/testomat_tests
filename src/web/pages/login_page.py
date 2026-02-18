@@ -19,14 +19,13 @@ class LoginPage:
         self.remember_me_checkbox = self._root_container.locator("#user_remember_me")
         self.signin_btn = page.get_by_role("button", name="Sign In")
 
-
     def open(self) -> Self:
         self.page.goto("/users/sign_in")
         return self
 
     def is_loaded(self) -> Self:
         expect(self.signup_href).to_be_visible(timeout=10000)
-        expect(self.auth_with_google).to_be_visible
+        expect(self.auth_with_google).to_be_visible()
         expect(self.auth_with_github).to_be_visible()
         expect(self.auth_with_sso).to_be_visible()
 
@@ -49,4 +48,3 @@ class LoginPage:
     def is_invalid_login_message_visible(self) -> Self:
         expect(self._root_container.get_by_text("Invalid Email or password.")).to_be_visible()
         return self
-    

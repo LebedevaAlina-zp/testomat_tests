@@ -1,7 +1,7 @@
 from playwright.sync_api import Locator, Page
 
 
-class HeaderNav():
+class HeaderNav:
     def __init__(self, page: Page):
         self.page = page
         self._header_container = self.page.locator("#content-desktop .auth-header-nav")

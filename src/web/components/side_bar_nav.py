@@ -1,9 +1,10 @@
-from playwright.sync_api import Locator, Page, expect
-from typing import Self
 import re
+from typing import Self
+
+from playwright.sync_api import Page, expect
 
 
-class SideBarNav():
+class SideBarNav:
     def __init__(self, page: Page):
         self.page = page
         self._menu_container = page.locator(".mainnav-menu")

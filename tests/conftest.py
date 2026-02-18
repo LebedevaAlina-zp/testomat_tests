@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 import pytest
 from dotenv import load_dotenv
-from playwright.sync_api import sync_playwright, Browser, BrowserContext
+from playwright.sync_api import Browser, BrowserContext, sync_playwright
 
 from src.web import Application
 from src.web.pages import LoginPage
@@ -50,7 +50,7 @@ def configs():
         base_url=os.getenv("BASE_URL"),
         login_url=os.getenv("BASE_APP_URL") + "/users/sign_in",
         email=os.getenv("EMAIL"),
-        password=os.getenv("PASSWORD")
+        password=os.getenv("PASSWORD"),
     )
 
 

@@ -6,6 +6,11 @@ from playwright.sync_api import Page, expect
 from src.web.components import HeaderNav
 
 
+class ProjectType(Enum):
+    CLASSICAL = "classical"
+    BDD = "bdd"
+
+
 class NewProjectPage:
     def __init__(self, page: Page):
         self.page = page
@@ -35,8 +40,7 @@ class NewProjectPage:
         expect(self.create_project_button).to_be_visible()
         return self
 
-    def create_new_project(self, project_title: str, project_type: ProjectType,
-                           fill_demo: bool = False) -> Self:
+    def create_new_project(self, project_title: str, project_type: ProjectType, fill_demo: bool = False) -> Self:
         if project_type == ProjectType.CLASSICAL:
             self.project_type_classical.click()
         elif project_type == ProjectType.BDD:
@@ -51,8 +55,3 @@ class NewProjectPage:
         expect(self.create_project_button).to_be_hidden(timeout=15_000)
 
         return self
-
-
-class ProjectType(Enum):
-    CLASSICAL = "classical"
-    BDD = "bdd"

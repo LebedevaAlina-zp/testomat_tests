@@ -22,15 +22,14 @@ class ProjectPage:
         self.input_new_suite_title = self.page.locator("[placeholder='First Suite']")
         self.add_suite_btn = self.page.get_by_role("button", name="Suite")
 
-    
     def open(self, project_name: str) -> Self:
-        """ Acceptable project_name:
-                project title (e.g. "Grocery & Shoes")
-                or slug (e.g. "grocery-shoes") """
+        """Acceptable project_name:
+        project title (e.g. "Grocery & Shoes")
+        or slug (e.g. "grocery-shoes")"""
         slug = re.sub(r"[^a-zA-Z0-9]+", "-", project_name)
         self.page.goto(f"/projects/{slug}")
         return self
-    
+
     def is_loaded(self) -> Self:
         expect(self.project_title).to_be_visible(timeout=20_000)
         expect(self.page.locator(".mainnav-menu")).to_be_visible(timeout=10_000)

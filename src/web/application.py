@@ -1,6 +1,6 @@
 from playwright.sync_api import Page
 
-from src.web.pages import HomePage, ProjectPage, LoginPage, NewProjectPage, ProjectsPage
+from src.web.pages import HomePage, LoginPage, NewProjectPage, ProjectPage, ProjectsPage
 
 
 class Application:
