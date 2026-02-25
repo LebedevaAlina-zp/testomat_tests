@@ -1,10 +1,15 @@
 import os
 from dataclasses import dataclass
+from pathlib import Path
 
 import pytest
 from dotenv import load_dotenv
 
 load_dotenv()
+
+
+STORAGE_STATE_PATH = Path("playwright/.auth/storage_state.json")
+FREE_PROJECT_STORAGE_STATE = Path("playwright/.auth/free_project_storage_state.json")
 
 
 BROWSER_LAUNCH_ARGS = {

@@ -4,3 +4,4 @@
 .tests/__pycache__/
 *.pyc
 .test-result/
+.playwright/.auth

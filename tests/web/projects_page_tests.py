@@ -39,8 +39,10 @@ def test_invalid_project_search(logged_app):
 def test_projects_company_switch(logged_app):
     default_company = "QA Club Lviv"
     default_subscription = "Enterprise plan"
+    enterprise_hint_message = "You have a Enterprise subscription"
     free_projects_company = "Free Projects"
     free_subscription = "free plan"
+    free_plan_hint_message = "You have a free subscription"
 
     projects_page = logged_app.projects_page
 
@@ -50,9 +52,15 @@ def test_projects_company_switch(logged_app):
     projects_page.expect_selected_company(default_company)
     projects_page.expect_current_subscription(default_subscription)
 
+    projects_page.current_subscription.hover(timeout=1000)
+    expect(projects_page.page.get_by_text(enterprise_hint_message)).to_be_visible
+
     projects_page.select_company(projects_page.company_options.free_projects)
 
     projects_page.expect_selected_company(free_projects_company)
     projects_page.expect_current_subscription(free_subscription)
 
     expect(projects_page.create_company_btn).to_be_visible()
+
+    projects_page.current_subscription.hover(timeout=2000)
+    expect(projects_page.page.get_by_text(free_plan_hint_message)).to_be_visible
