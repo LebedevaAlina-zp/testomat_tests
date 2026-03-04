@@ -34,14 +34,16 @@ CONTEXT_ARGS = {
 class Config:
     base_url: str
     login_url: str
+    base_app_url: str
     email: str
     password: str
 
 
 @pytest.fixture(scope="session")
-def configs():
+def configs() -> Config:
     return Config(
         base_url=os.getenv("BASE_URL"),
+        base_app_url=os.getenv("BASE_APP_URL"),
         login_url=os.getenv("BASE_APP_URL") + "/users/sign_in",
         email=os.getenv("EMAIL"),
         password=os.getenv("PASSWORD"),
