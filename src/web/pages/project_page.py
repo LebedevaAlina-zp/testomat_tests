@@ -22,12 +22,16 @@ class ProjectPage:
         self.input_new_suite_title = self.page.locator("[placeholder='First Suite']")
         self.add_suite_btn = self.page.get_by_role("button", name="Suite")
 
-    def open(self, project_name: str) -> Self:
+    def open_by_project_name(self, project_name: str) -> Self:
         """Acceptable project_name:
         project title (e.g. "Grocery & Shoes")
         or slug (e.g. "grocery-shoes")"""
         slug = re.sub(r"[^a-zA-Z0-9]+", "-", project_name)
         self.page.goto(f"/projects/{slug}")
+        return self
+
+    def open_by_id(self, project_id: str) -> Self:
+        self.page.goto(f"/projects/{project_id}")
         return self
 
     def is_loaded(self) -> Self:
@@ -43,4 +47,18 @@ class ProjectPage:
 
     def verify_project_title_is(self, expected_title) -> Self:
         expect(self.project_title).to_have_text(expected_title)
+        return self
+
+    def create_suite(self, suite_title: str) -> Self:
+        """Create a test suite via '+ Test' dropdown menu"""
+        self.page.get_by_role("button", name="Test").locator(
+            ":scope + .ember-basic-dropdown button.btn-split-left"
+        ).click()
+        self.page.get_by_role("button", name="Suite", exact=False).click()
+        self.page.get_by_role("combobox", name="Title").fill(suite_title)
+        self.page.get_by_role("button", name="Save").fill(suite_title)
+        return self
+
+    def suite_with_title_is_visible(self, suite_title: str) -> Self:
+        expect(self.page.locator(".suites-list-content").get_by_text(suite_title)).to_be_visible()
         return self

@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Any
 
 import requests
+from requests import Response
 
 from src.api.models import Project, ProjectsResponse
 
@@ -69,9 +70,6 @@ class ApiClient:
 
         Returns parsed model (never None).
         """
-        if not self._session.headers.get("Authorization"):
-            self._authenticate()
-
         resp = self._session.get(self._url("/api/projects"), timeout=self._timeout)
         resp.raise_for_status()
 
@@ -93,8 +91,48 @@ class ApiClient:
 
     def projects_list(self) -> list[Project]:
         """Returns a list of projects from api/get_projects endpoint response"""
-        if not self._session.headers.get("Authorization"):
-            self._authenticate()
-
         resp = self.get_projects()
         return resp.data
+
+    def create_test_suite(self, project_id: str, suite_title: str) -> Response:
+        """Create a test suite via POST /api/{project_id}/suites"""
+        resp = self._session.post(
+            self._url(f"/api/{project_id}/suites"),
+            headers={"Content-Type": "application/json"},
+            json={
+                "type": "suite",
+                "attributes": {
+                    "suite-id": "",
+                    "title": "",
+                    "descriprion": "",
+                    "code": "",
+                    "file": "",
+                    "fullpath": "",
+                    "file-type": "",
+                    "to_url": "",
+                    "tags": [""],
+                    "test-count": 1,
+                    "tests": [""],
+                    "children": [""],
+                    "created-at": "",
+                    "updated-at": "",
+                    "comments_count": 1,
+                },
+                "relationships": {"children": {"additionalProperty": "anything"}},
+            },
+        )
+        resp.raise_for_status()
+        return resp
+
+    def get_project_id_by_title(self, project_title: str) -> str:
+        projects = self.projects_list()
+        for project in projects:
+            if project.attributes.title == project_title:
+                return project.id
+        return ""
+
+    def delete_project(self, project_id: str) -> Response:
+        """Delete a project via DELETE /api/projects/{project_id}"""
+        resp = self._session.delete(self._url(f"/api/projects/{project_id}"))
+        resp.raise_for_status()
+        return resp

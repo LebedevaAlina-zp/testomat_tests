@@ -30,8 +30,8 @@ class NewProjectPage:
         return self
 
     def is_loaded(self) -> Self:
-        expect(self.header.dashboard_link).to_be_visible()
-        expect(self.header.create_project_button).to_be_visible()
+        self.header.is_loaded()
+        expect(self.create_project_button).to_be_visible()
         expect(self._root.locator("h2")).to_have_text("New Project")
         expect(self._root.get_by_text("How to start?")).to_be_visible()
         expect(self.project_type_classical).to_contain_text("Classical")
