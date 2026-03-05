@@ -3,14 +3,23 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
-from playwright.sync_api import Browser, BrowserContext
+from playwright.sync_api import (
+    Browser,
+    BrowserContext,
+    Page,
+)
 
 from src.web import Application
 
-from .config import CONTEXT_ARGS, FREE_PROJECT_STORAGE_STATE, STORAGE_STATE_PATH, Config
+from .config import (
+    CONTEXT_ARGS,
+    FREE_PROJECT_STORAGE_STATE,
+    STORAGE_STATE_PATH,
+    Config,
+)
 
 
-def clear_browser_data(context: BrowserContext):
+def clear_browser_data(context: BrowserContext) -> None:
     """Clears cookies and local/session storage for all pages in the browser context."""
     context.clear_cookies()
     for page in context.pages:
@@ -32,7 +41,9 @@ def expires_in_x_seconds(storage_state_path: Path, x: int) -> bool:
     return True
 
 
-def generate_free_plan_storage_state(storage_state: Path, free_plan_storage_state: Path):
+def generate_free_plan_storage_state(
+    storage_state: Path, free_plan_storage_state: Path
+) -> None:
     """Creates a storage state file for a free plan logged-in user
     based on an existing storage state with a default plan."""
 
@@ -49,7 +60,7 @@ def generate_free_plan_storage_state(storage_state: Path, free_plan_storage_stat
 
 
 @pytest.fixture(scope="module")
-def browser_context(browser: Browser):
+def browser_context(browser: Browser) -> BrowserContext:
     """Browser context instance for the module tests."""
     context = browser.new_context(**CONTEXT_ARGS)
     yield context
@@ -57,7 +68,7 @@ def browser_context(browser: Browser):
 
 
 @pytest.fixture(scope="module")
-def shared_page(browser_context: BrowserContext):
+def shared_page(browser_context: BrowserContext) -> Page:
     """Shared browser page for the module tests."""
     page = browser_context.new_page()
     yield page
@@ -65,19 +76,22 @@ def shared_page(browser_context: BrowserContext):
 
 
 @pytest.fixture(scope="function")
-def app(shared_page):
+def app(shared_page: Page) -> Application:
     """Application instance with clean browser context for each test."""
     yield Application(shared_page)
     clear_browser_data(shared_page.context)
 
 
 @pytest.fixture(scope="session")
-def logged_context(browser: Browser, configs: Config):
+def logged_context(browser: Browser, configs: Config) -> BrowserContext:
     """Session scope context for reuse logged-in state."""
 
     if STORAGE_STATE_PATH.exists():
         if not expires_in_x_seconds(STORAGE_STATE_PATH, 60):
-            context = browser.new_context(**CONTEXT_ARGS, storage_state=STORAGE_STATE_PATH)
+            context = browser.new_context(
+                **CONTEXT_ARGS,
+                storage_state=STORAGE_STATE_PATH,
+            )
             yield context
             context.close()
             return
@@ -102,15 +116,22 @@ def logged_context(browser: Browser, configs: Config):
 
 
 @pytest.fixture(scope="session")
-def free_plan_context(logged_context: BrowserContext, browser: Browser):
+def free_plan_context(
+    logged_context: BrowserContext, browser: Browser
+) -> BrowserContext:
     """Session scope context for reuse free plan logged-in state."""
-    context = browser.new_context(**CONTEXT_ARGS, storage_state=FREE_PROJECT_STORAGE_STATE)
+    context = browser.new_context(
+        **CONTEXT_ARGS,
+        storage_state=FREE_PROJECT_STORAGE_STATE,
+    )
     yield context
     context.close()
 
 
 @pytest.fixture(scope="function")
-def logged_app(logged_context: BrowserContext):
+def logged_app(
+    logged_context: BrowserContext,
+) -> Application:
     """Application instance with logged-in state for each test."""
     page = logged_context.new_page()
     yield Application(page)
@@ -118,7 +139,9 @@ def logged_app(logged_context: BrowserContext):
 
 
 @pytest.fixture(scope="function")
-def free_plan_app(free_plan_context: BrowserContext):
+def free_plan_app(
+    free_plan_context: BrowserContext,
+) -> Application:
     """Application instance with free plan logged-in state for each test."""
     page = free_plan_context.new_page()
     yield Application(page)

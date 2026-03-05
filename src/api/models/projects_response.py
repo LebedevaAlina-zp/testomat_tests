@@ -24,14 +24,14 @@ class ProjectsResponse:
         return ProjectsResponse(data=projects)
 
     @staticmethod
-    def from_json(payload: Any) -> list[ProjectsResponse] | ProjectsResponse:
-        """Parse JSON into models.
-
-        The example file shows a top-level list of response objects. To be robust
-        we support both a single-object response and a list of response objects.
-        """
+    def from_json(
+        payload: Any,
+    ) -> list[ProjectsResponse] | ProjectsResponse:
+        """Parse JSON into models."""
         if isinstance(payload, list):
-            return [ProjectsResponse.from_dict(x) for x in payload if isinstance(x, dict)]
+            return [
+                ProjectsResponse.from_dict(x) for x in payload if isinstance(x, dict)
+            ]
         if isinstance(payload, dict):
             return ProjectsResponse.from_dict(payload)
         return ProjectsResponse(data=[])

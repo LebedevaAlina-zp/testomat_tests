@@ -40,7 +40,9 @@ class ProjectAttributes:
     raw: dict[str, Any] | None = None
 
     @staticmethod
-    def from_dict(data: dict[str, Any]) -> ProjectAttributes:
+    def from_dict(
+        data: dict[str, Any],
+    ) -> ProjectAttributes:
         return ProjectAttributes(
             title=_get(data, "title"),
             lang=_get(data, "lang"),
@@ -69,7 +71,11 @@ class Project:
     @staticmethod
     def from_dict(data: dict[str, Any]) -> Project:
         attrs_raw = _get(data, "attributes") or {}
-        attrs = ProjectAttributes.from_dict(attrs_raw) if isinstance(attrs_raw, dict) else ProjectAttributes()
+        attrs = (
+            ProjectAttributes.from_dict(attrs_raw)
+            if isinstance(attrs_raw, dict)
+            else ProjectAttributes()
+        )
         return Project(
             id=str(_get(data, "id")),
             type=str(_get(data, "type")),

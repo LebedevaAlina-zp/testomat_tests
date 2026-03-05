@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import random
 from dataclasses import dataclass
 from typing import Any
 
@@ -23,7 +24,13 @@ class ApiClient:
     then sends the received token in the Authorization header for subsequent calls.
     """
 
-    def __init__(self, base_url: str, email: str, password: str, timeout: float = 15.0) -> None:
+    def __init__(
+        self,
+        base_url: str,
+        email: str,
+        password: str,
+        timeout: float = 15.0,
+    ) -> None:
         self._base_url = base_url.rstrip("/")
         self._email = email
         self._password = password
@@ -49,7 +56,10 @@ class ApiClient:
         """
         resp = self._session.post(
             self._url("/api/login"),
-            data={"email": self._email, "password": self._password},
+            data={
+                "email": self._email,
+                "password": self._password,
+            },
             timeout=self._timeout,
         )
         resp.raise_for_status()
@@ -60,17 +70,23 @@ class ApiClient:
 
         token = payload.get("jwt") if isinstance(payload, dict) else None
         if not token or not isinstance(token, str):
-            raise requests.HTTPError("Login response does not contain 'jwt' token", response=resp)
+            raise requests.HTTPError(
+                "Login response does not contain 'jwt' token",
+                response=resp,
+            )
 
         self._jwt = token
         self._session.headers.update({"Authorization": token})
 
     def get_projects(self) -> ProjectsResponse:
-        """Fetch projects for the authenticated user via /api/projects.
+        """Get projects for the authenticated user via /api/projects.
 
-        Returns parsed model (never None).
+        Returns parsed model.
         """
-        resp = self._session.get(self._url("/api/projects"), timeout=self._timeout)
+        resp = self._session.get(
+            self._url("/api/projects"),
+            timeout=self._timeout,
+        )
         resp.raise_for_status()
 
         payload: Any
@@ -94,37 +110,8 @@ class ApiClient:
         resp = self.get_projects()
         return resp.data
 
-    def create_test_suite(self, project_id: str, suite_title: str) -> Response:
-        """Create a test suite via POST /api/{project_id}/suites"""
-        resp = self._session.post(
-            self._url(f"/api/{project_id}/suites"),
-            headers={"Content-Type": "application/json"},
-            json={
-                "type": "suite",
-                "attributes": {
-                    "suite-id": "",
-                    "title": "",
-                    "descriprion": "",
-                    "code": "",
-                    "file": "",
-                    "fullpath": "",
-                    "file-type": "",
-                    "to_url": "",
-                    "tags": [""],
-                    "test-count": 1,
-                    "tests": [""],
-                    "children": [""],
-                    "created-at": "",
-                    "updated-at": "",
-                    "comments_count": 1,
-                },
-                "relationships": {"children": {"additionalProperty": "anything"}},
-            },
-        )
-        resp.raise_for_status()
-        return resp
-
     def get_project_id_by_title(self, project_title: str) -> str:
+        """Returns project id finding a project in a projects list by title"""
         projects = self.projects_list()
         for project in projects:
             if project.attributes.title == project_title:
