@@ -3,7 +3,12 @@ from typing import Self
 
 from playwright.sync_api import Page, expect
 
-from src.web.components import SideBarNav
+from src.web.components import (
+    EmptyProjectTestsTab,
+    ProjectPageTestsTab,
+    SideBarNav,
+    SuiteCreationForm,
+)
 
 
 class ProjectPage:
@@ -11,16 +16,13 @@ class ProjectPage:
         self.page = page
 
         self.side_bar = SideBarNav(page)
+        self.suite_creation_form = SuiteCreationForm(page)
 
-        self.project_title = self.page.locator(".first h2")
+        # Tests tab (default opened) differs depending on whether a project has suites
+        self.tests_tab = ProjectPageTestsTab(page)
+        self.empty_project_tests_tab = EmptyProjectTestsTab(page)
 
-        self.readme_block_resizer = self.page.locator(".resizer")
-        self.readme_block_edit_btn = self.page.locator(".detail-view-actions [href*=readme]")
-        self.readme_block_lets_start_btn = self.page.locator(".detail-view-content .primary-btn")
-        self.readme_block_close_btn = self.page.locator(".back")
-
-        self.input_new_suite_title = self.page.locator("[placeholder='First Suite']")
-        self.add_suite_btn = self.page.get_by_role("button", name="Suite")
+        self.current_tab_name = self.page.locator(".breadcrumbs-page-second-level")
 
     def open_by_project_name(self, project_name: str) -> Self:
         """Acceptable project_name:
@@ -35,14 +37,15 @@ class ProjectPage:
         return self
 
     def is_loaded(self) -> Self:
-        expect(self.project_title).to_be_visible(timeout=20_000)
-        expect(self.page.locator(".mainnav-menu")).to_be_visible(timeout=10_000)
-        expect(self.page.locator("#welcometotestomatio")).to_be_visible()
-        expect(self.readme_block_resizer).to_be_visible()
-        expect(self.readme_block_edit_btn).to_be_visible()
-        expect(self.readme_block_close_btn).to_be_visible()
-        expect(self.input_new_suite_title).to_be_visible()
-        expect(self.add_suite_btn).to_be_visible()
+        self.side_bar.is_loaded()
+        expect(self.current_tab_name).to_have_text("Tests")
+        self.tests_tab.is_loaded()
+        return self
+
+    def is_loaded_empty(self):
+        self.side_bar.is_loaded()
+        self.empty_project_tests_tab.is_loaded()
+        self.empty_project_tests_tab.readme_block.is_loaded()
         return self
 
     def verify_project_title_is(self, expected_title) -> Self:
@@ -50,15 +53,18 @@ class ProjectPage:
         return self
 
     def create_suite(self, suite_title: str) -> Self:
-        """Create a test suite via '+ Test' dropdown menu"""
+        """Create a test suite via '+ Suite' in '+ Test' dropdown menu"""
         self.page.get_by_role("button", name="Test").locator(
             ":scope + .ember-basic-dropdown button.btn-split-left"
         ).click()
-        self.page.get_by_role("button", name="Suite", exact=False).click()
-        self.page.get_by_role("combobox", name="Title").fill(suite_title)
-        self.page.get_by_role("button", name="Save").fill(suite_title)
+        self.page.get_by_text("Collection of test cases").click()
+        self.suite_creation_form.is_loaded()
+        self.suite_creation_form.fill_suite_form(suite_title)
+        self.suite_creation_form.save_suite()
         return self
 
     def suite_with_title_is_visible(self, suite_title: str) -> Self:
-        expect(self.page.locator(".suites-list-content").get_by_text(suite_title)).to_be_visible()
+        expect(
+            self.page.locator(".suites-list-content").get_by_text(suite_title)
+        ).to_be_visible()
         return self

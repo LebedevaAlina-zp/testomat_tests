@@ -23,6 +23,12 @@ def test_create_new_project_positive(logged_app: Application, api_client: ApiCli
     project_id = api_client.get_project_id_by_title(valid_project_title)
     assert project_id != ""
 
+    project_page = logged_app.project_page
+    project_page.is_loaded_empty()
+    project_page.empty_project_tests_tab.verify_project_title_is(valid_project_title)
+    expect(project_page.page.locator("#welcometotestomatio")).to_be_visible()
+    project_page.empty_project_tests_tab.readme_block.click_close()
+
     # Delete the project
     assert api_client.delete_project(project_id).status_code in [200, 204]
 
