@@ -27,7 +27,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
-testpaths = ["tests/web"]
+testpaths = ["tests/"]
 python_files = ["test_*.py", "*_test.py", "*_tests.py"]
 python_functions = ["test_*"]
 norecursedirs = [".git", ".venv", ".idea", "__pycache__", "build", "dist"]

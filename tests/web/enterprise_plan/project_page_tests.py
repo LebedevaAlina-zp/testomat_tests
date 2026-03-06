@@ -11,11 +11,7 @@ def test_random_project_side_bar_navigation(
     logged_app: Application, api_client: ApiClient
 ):
     """Check side bar navigation on a random not empty project."""
-    random_project = api_client.pick_random_project()
-
-    # If a project is empty, add a test suite with api
-    if len(api_client.suites_list(random_project)) == 0:
-        api_client.create_test_suite(random_project, suite_title=Faker().word())
+    random_project = api_client.pick_random_project(empty=False)
 
     project_page = logged_app.project_page.open_by_id(random_project)
     project_page.is_loaded()
