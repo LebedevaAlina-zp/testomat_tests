@@ -15,8 +15,26 @@ from .config import (
     CONTEXT_ARGS,
     FREE_PROJECT_STORAGE_STATE,
     STORAGE_STATE_PATH,
+    TRACES_DIR,
     Config,
 )
+
+
+def start_tracing(page: Page) -> None:
+    """Starts recording Playwright trace"""
+    page.context.tracing.start(screenshots=True, snapshots=True, sources=True)
+
+
+def stop_tracing_on_failure(page: Page, request: pytest.FixtureRequest) -> None:
+    """Stops recording Playwright trace and saves it to a file"""
+    failed = hasattr(request.node, "rep_call") and request.node.rep_call.failed
+    if failed:
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
+        trace_path = TRACES_DIR / f"{timestamp}-{request.node.name}-trace.zip"
+        trace_path.parent.mkdir(parents=True, exist_ok=True)
+        page.context.tracing.stop(path=trace_path)
+    else:
+        page.context.tracing.stop()
 
 
 def clear_browser_data(context: BrowserContext) -> None:
@@ -67,19 +85,15 @@ def browser_context(browser: Browser) -> BrowserContext:
     context.close()
 
 
-@pytest.fixture(scope="module")
-def shared_page(browser_context: BrowserContext) -> Page:
-    """Shared browser page for the module tests."""
-    page = browser_context.new_page()
-    yield page
-    page.close()
-
-
 @pytest.fixture(scope="function")
-def app(shared_page: Page) -> Application:
+def app(browser_context, request: pytest.FixtureRequest) -> Application:
     """Application instance with clean browser context for each test."""
-    yield Application(shared_page)
-    clear_browser_data(shared_page.context)
+    page = browser_context.new_page()
+    start_tracing(page)
+    yield Application(page)
+    stop_tracing_on_failure(page=page, request=request)
+    page.close()
+    clear_browser_data(page.context)
 
 
 @pytest.fixture(scope="session")
@@ -121,8 +135,7 @@ def free_plan_context(
 ) -> BrowserContext:
     """Session scope context for reuse free plan logged-in state."""
     context = browser.new_context(
-        **CONTEXT_ARGS,
-        storage_state=FREE_PROJECT_STORAGE_STATE,
+        **CONTEXT_ARGS, storage_state=FREE_PROJECT_STORAGE_STATE
     )
     yield context
     context.close()
@@ -130,19 +143,23 @@ def free_plan_context(
 
 @pytest.fixture(scope="function")
 def logged_app(
-    logged_context: BrowserContext,
+    logged_context: BrowserContext, request: pytest.FixtureRequest
 ) -> Application:
     """Application instance with logged-in state for each test."""
     page = logged_context.new_page()
+    start_tracing(page)
     yield Application(page)
+    stop_tracing_on_failure(page=page, request=request)
     page.close()
 
 
 @pytest.fixture(scope="function")
 def free_plan_app(
-    free_plan_context: BrowserContext,
+    free_plan_context: BrowserContext, request: pytest.FixtureRequest
 ) -> Application:
     """Application instance with free plan logged-in state for each test."""
     page = free_plan_context.new_page()
+    start_tracing(page)
     yield Application(page)
+    stop_tracing_on_failure(page=page, request=request)
     page.close()

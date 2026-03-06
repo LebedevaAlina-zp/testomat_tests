@@ -5,19 +5,22 @@ from pathlib import Path
 import pytest
 from dotenv import load_dotenv
 
+from tests.conftest import TEST_RESULT_DIR
+
 load_dotenv()
 
 
 STORAGE_STATE_PATH = Path("playwright/.auth/storage_state.json")
 FREE_PROJECT_STORAGE_STATE = Path("playwright/.auth/free_project_storage_state.json")
 
+VIDEO_DIR = TEST_RESULT_DIR / "videos"
+TRACES_DIR = TEST_RESULT_DIR / "traces"
 
 BROWSER_LAUNCH_ARGS = {
     "channel": "chrome",
     "headless": False,
     "slow_mo": 0,
     "timeout": 120000,
-    # "traces_dir": "test-result/traces"
 }
 
 CONTEXT_ARGS = {
@@ -25,7 +28,7 @@ CONTEXT_ARGS = {
     "viewport": {"width": 1540, "height": 728},
     "locale": "uk-UA",
     "timezone_id": "Europe/Kyiv",
-    "record_video_dir": "videos/",
+    #    "record_video_dir": str(VIDEO_DIR),
     "permissions": ["geolocation"],
 }
 
