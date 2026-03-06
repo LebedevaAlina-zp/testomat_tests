@@ -9,6 +9,7 @@ dependencies = [
     "playwright>=1.58.0",
     "pytest>=9.0.2",
     "pytest-html>=4.2.0",
+    "pytest-retry>=1.7.0",
     "python-dotenv>=1.2.1",
     "requests>=2.32.0",
 ]
@@ -44,6 +45,7 @@ markers = [
     "web: Web UI tests using Playwright",
     "api: API tests using requests lib",
     "slow: Tests that take longer to execute",
+    "flaky: Flaky tests to retry on failure"
 ]
 console_output_style = "progress"
 log_cli = true

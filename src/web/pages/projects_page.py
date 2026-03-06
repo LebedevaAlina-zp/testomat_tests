@@ -19,15 +19,21 @@ class ProjectsPage:
 
         self.header = HeaderNav(page)
 
-        self.sign_in_flash_message = self._root.locator(".common-flash-success", has_text="Signed in successfully")
+        self.sign_in_flash_message = self._root.locator(
+            ".common-flash-success", has_text="Signed in successfully"
+        )
 
         # Page header (Projects header area)
         self.page_header = self._root.locator(".common-page-header")
 
         # Projects header elements
         self.company_dropdown = self.page_header.locator("#company_id")
-        self.current_subscription = self.page_header.locator(".tooltip-project-plan span")
-        self.create_company_btn = self.page_header.get_by_role("link", name="Create Company to Upgrade")
+        self.current_subscription = self.page_header.locator(
+            ".tooltip-project-plan span"
+        )
+        self.create_company_btn = self.page_header.get_by_role(
+            "link", name="Create Company to Upgrade"
+        )
         self.view_switcher = self.page_header.locator(".common-page-header-icons")
         self.grid_view_icon = self.view_switcher.locator("svg[data-icon='grid']")
         self.table_view_icon = self.view_switcher.locator("svg[data-icon='table']")
@@ -42,8 +48,8 @@ class ProjectsPage:
         return self
 
     def is_loaded(self) -> Self:
-        expect(self.header.dashboard_link).to_be_visible()
-        expect(self.header.create_project_button).to_be_visible()
+        expect(self.header.dashboard).to_be_visible()
+        expect(self.header.create_project_icon).to_be_visible()
         expect(self.search_input).to_be_visible()
         expect(self.grid).to_be_visible()
         return self

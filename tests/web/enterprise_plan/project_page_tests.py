@@ -39,11 +39,10 @@ def test_nonempty_project_suite_creation(
     project_page = logged_app.project_page.open_by_id(project_id)
     project_page.is_loaded()
     project_page.create_suite(suite_title)
+    project_page.suite_with_title_is_visible(suite_title)
 
     suite_id = api_client.get_suite_id_by_title(project_id, suite_title)
     assert suite_id != ""
-
-    project_page.suite_with_title_is_visible(suite_title)
 
     # Delete the suite
     api_client.delete_suite(project_id, suite_id)
