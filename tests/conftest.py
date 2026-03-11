@@ -28,4 +28,5 @@ pytest_plugins = [
     "tests.fixtures.playwright",
     "tests.fixtures.cookie_helper",
     "tests.fixtures.api",
+    "tests.fixtures.selenium",
 ]
