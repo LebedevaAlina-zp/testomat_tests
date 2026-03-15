@@ -49,7 +49,7 @@ class ProjectPage:
         return self
 
     def verify_project_title_is(self, expected_title) -> Self:
-        expect(self.project_title).to_have_text(expected_title)
+        expect(self.page.locator(f"[title={expected_title}]")).to_be_visible()
         return self
 
     def create_suite(self, suite_title: str) -> Self:

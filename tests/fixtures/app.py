@@ -45,7 +45,7 @@ def clear_browser_data(context: BrowserContext) -> None:
         page.evaluate("sessionStorage.clear()")
 
 
-def expires_in_x_seconds(storage_state_path: Path, x: int) -> bool:
+def expires_in_x_seconds(storage_state_path: Path, x: int = 60) -> bool:
     """Checks if storage state file expires in x seconds."""
     storage_state = json.loads(storage_state_path.read_text())
     now = datetime.now(UTC)
@@ -101,7 +101,7 @@ def logged_context(browser: Browser, configs: Config) -> BrowserContext:
     """Session scope context for reuse logged-in state."""
 
     if STORAGE_STATE_PATH.exists():
-        if not expires_in_x_seconds(STORAGE_STATE_PATH, 60):
+        if not expires_in_x_seconds(STORAGE_STATE_PATH):
             context = browser.new_context(
                 **CONTEXT_ARGS,
                 storage_state=STORAGE_STATE_PATH,

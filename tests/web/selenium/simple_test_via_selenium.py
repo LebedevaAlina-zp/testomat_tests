@@ -1,3 +1,4 @@
+import pytest
 from selenium.common import NoSuchElementException, StaleElementReferenceException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.ie.webdriver import WebDriver
@@ -7,6 +8,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from tests.fixtures import Config
 
 
+@pytest.mark.selenium
 def test_selenium_login_and_search(driver: WebDriver, configs: Config):
     wait = WebDriverWait(
         driver,

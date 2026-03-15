@@ -46,7 +46,8 @@ markers = [
     "web: Web UI tests using Playwright",
     "api: API tests using requests lib",
     "slow: Tests that take longer to execute",
-    "flaky: Flaky tests to retry on failure"
+    "flaky: Flaky tests to retry on failure",
+    "selenium: Selenium UI tests"
 ]
 console_output_style = "progress"
 log_cli = true

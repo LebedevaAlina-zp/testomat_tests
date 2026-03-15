@@ -10,8 +10,11 @@ from tests.conftest import TEST_RESULT_DIR
 load_dotenv()
 
 
-STORAGE_STATE_PATH = Path("playwright/.auth/storage_state.json")
-FREE_PROJECT_STORAGE_STATE = Path("playwright/.auth/free_project_storage_state.json")
+STORAGE_STATE_PATH = Path("tests/.auth_state/playwright/storage_state.json")
+FREE_PROJECT_STORAGE_STATE = Path(
+    "tests/.auth_state/playwright/free_project_storage_state.json"
+)
+
 
 VIDEO_DIR = TEST_RESULT_DIR / "videos"
 TRACES_DIR = TEST_RESULT_DIR / "traces"
