@@ -15,21 +15,23 @@ class CompanyOptions:
 
 
 class ProjectsPage(BasePage):
-    # Page header (Projects header area)
-    # self.page_header = self._root.locator(".common-page-header")
-
     # Projects header elements
     PAGE_TITLE = (By.CSS_SELECTOR, ".common-page-header h2")
 
+    # Common elements
     COMPANY_DROPDOWN = (By.CSS_SELECTOR, "#content-desktop #company_id")
-
-    CREATE_COMPANY_BTN = (By.CSS_SELECTOR, "[href='/companies/new']")
     CURRENT_PLAN = (By.CSS_SELECTOR, ".tooltip-project-plan span")
     GRID_ICON = (By.CSS_SELECTOR, "#grid-icon")
     TABLE_ICON = (By.CSS_SELECTOR, "#table-icon")
     SEARCH_INPUT = (By.CSS_SELECTOR, "#search")
 
-    # self.project_cards = self.grid.locator("li")
+    # Free plan elements
+    CREATE_COMPANY_BTN = (By.CSS_SELECTOR, "[href='/companies/new']")
+    HAVE_NOT_CREATED_PROJECTS_TEXT = (By.CSS_SELECTOR, ".items-center p")
+    CREATE_PROJECT_CENTER_BTN = (By.CSS_SELECTOR, ".items-center .common-btn-lg[href]")
+
+    # Enterprise plan elements
+    PROJECT_CARDS = (By.CSS_SELECTOR, "#content-desktop li")
 
     def __init__(self, driver: WebDriver, configs: Config):
         super().__init__(driver, configs)
@@ -38,10 +40,29 @@ class ProjectsPage(BasePage):
         self.driver.get(self.configs.base_app_url)
         return self
 
-    def is_loaded_free_plan(self):
+    def _header_is_loaded(self):
         self.wait.for_visible(self.PAGE_TITLE)
         assert self.get_text(self.PAGE_TITLE) == "Projects"
-        # assert self.get_text(self.PAGE_TITLE) == "You have not created any projects yet"
+        self.wait.for_visible(self.COMPANY_DROPDOWN)
+        self.wait.for_visible(self.CURRENT_PLAN)
+        self.wait.for_visible(self.GRID_ICON)
+        self.wait.for_visible(self.TABLE_ICON)
+        self.wait.for_visible(self.SEARCH_INPUT)
+
+    def is_loaded_free_plan(self):
+        self._header_is_loaded()
+        self.wait.for_visible(self.CREATE_COMPANY_BTN)
+        assert self.find(self.CURRENT_PLAN).text == "Free Plan"
+        self.wait.for_visible(self.CREATE_PROJECT_CENTER_BTN)
+        assert (
+            self.find(self.HAVE_NOT_CREATED_PROJECTS_TEXT).text
+            == "You have not created any projects yet"
+        )
+
+    def is_loaded_default_enterprise(self):
+        self._header_is_loaded()
+        assert self.find(self.CURRENT_PLAN).text == "Enterprise Plan"
+        self.wait.for_visible(self.PROJECT_CARDS)
 
     @property
     def company_options(self) -> CompanyOptions:

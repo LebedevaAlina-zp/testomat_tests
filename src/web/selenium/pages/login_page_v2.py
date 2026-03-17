@@ -5,11 +5,12 @@ from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 
 from src.web.selenium.core.base_page import BasePage
+from tests.fixtures import Config
 
 
 class LoginPageV2(BasePage):
-    def __init__(self, driver: WebDriver):
-        super().__init__(driver)
+    def __init__(self, driver: WebDriver, configs: Config):
+        super().__init__(driver, configs)
 
     @property
     def email_input(self) -> WebElement:
