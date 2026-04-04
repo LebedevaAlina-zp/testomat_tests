@@ -43,6 +43,7 @@ class Config:
     base_app_url: str
     email: str
     password: str
+    testomat_token: str
 
 
 @pytest.fixture(scope="session")
@@ -53,4 +54,5 @@ def configs() -> Config:
         login_url=os.getenv("BASE_APP_URL") + "/users/sign_in",
         email=os.getenv("EMAIL"),
         password=os.getenv("PASSWORD"),
+        testomat_token=os.getenv("TESTOMAT_TOKEN"),
     )

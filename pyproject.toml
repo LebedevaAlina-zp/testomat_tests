@@ -7,6 +7,7 @@ requires-python = ">=3.14"
 dependencies = [
     "faker>=39.0.0",
     "playwright>=1.58.0",
+    "pydantic>=2.12.5",
     "pytest>=9.0.2",
     "pytest-html>=4.2.0",
     "pytest-retry>=1.7.0",
@@ -87,3 +88,10 @@ unfixable = []
 
 [tool.ruff.format]
 skip-magic-trailing-comma = false
+
+[tool.datamodel-codegen]
+input = "./testomat_api.yaml"
+output = "./src/api/models/models.py"
+target-python-version = "3.14"
+snake-case-field = true
+field-constraints = true

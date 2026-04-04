@@ -90,12 +90,15 @@ BASE_URL=https://testomat.io
 BASE_APP_URL=https://app.testomat.io
 EMAIL=your_email@example.com
 PASSWORD=your_password
+TESTOMAT_TOKEN=your_access_token
 ```
 
 Notes
 
 - Default Playwright context `base_url` is set to `https://app.testomat.io` in `tests/fixtures/config.py`.
 - Auth/session state is cached in `playwright/.auth/storage_state.json` between runs by session fixtures.
+- Generate an access token at https://app.testomat.io/account/access_tokens and set it as `TESTOMAT_TOKEN` in your
+  `.env`. This token is required for API interactions/tests.
 
 ## Running Tests
 
@@ -144,6 +147,34 @@ Configured in `pyproject.toml`:
 - `api` – API tests
 - `slow` – Long-running tests
 - `flaky` – Flaky tests to retry on failure
+- `selenium` – UI tests using Selenium
+
+## Selenium UI Tests
+
+This project also contains a minimal Selenium-based UI automation layer and tests. Use it when you want to demonstrate
+WebDriver usage or compare approaches with Playwright.
+
+Structure:
+
+```
+src/web/selenium/
+├── core/
+│   ├── base_page.py      # BasePage: navigation, interactions, waits wrapper
+│   └── waits.py          # Wait helper around WebDriverWait + EC
+└── pages/
+    ├── login_page.py     # Page Object using static locators
+    └── login_page_v2.py  # Page Object using properties + typed elements
+
+tests/fixtures/selenium.py  # Selenium fixtures and auth state helpers
+tests/web/selenium/         # Selenium tests (@pytest.mark.selenium)
+```
+
+### Requirements for Selenium
+
+- Python >= 3.14 (same virtualenv as the project)
+- Google Chrome installed
+- Chromedriver is resolved automatically by Selenium Manager (bundled with Selenium >= 4.6); no manual driver download
+  is required
 
 ## Architecture
 

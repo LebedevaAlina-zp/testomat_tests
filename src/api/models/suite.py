@@ -1,115 +1,140 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Any
 
-from .helper import _get
+from pydantic import BaseModel, ConfigDict, Field
 
 
-@dataclass(frozen=True)
-class SuiteAttributes:
-    """Subset of suite attributes returned by Testomat API.
+class SuiteAttributes(BaseModel):
+    """Pydantic version of suite attributes returned by Testomat API."""
 
-    Only commonly used fields are mapped; the rest are available via `raw`.
-    """
+    model_config = ConfigDict(populate_by_name=True, extra="allow")
+
+    # identity / presentation
+    suite_id: str | None = Field(default=None, alias="suite-id")
+    title: str | None = None
+    description: str | None = None
+    emoji: Any | None = None
+    sync: bool | None = None
+    file_type: str | None = Field(default=None, alias="file-type")
 
     # arrays
     labels: list[str] | None = None
     tags: list[str] | None = None
+    tests: list[str] | None = None
+    children: list[str] | None = None
 
     # miscellaneous
     issues: Any | None = None
-    jira_issues: Any | None = None
-    is_branched: bool | None = None
-    is_detail: bool | None = None
+    jira_issues: Any | None = Field(default=None, alias="jira-issues")
+    is_branched: bool | None = Field(default=None, alias="is-branched")
+    is_detail: bool | None = Field(default=None, alias="is-detail")
     attachments: Any | None = None
-    is_linked: bool | None = None
-    is_shared: bool | None = None
-
-    # identity / presentation
-    title: str | None = None
-    emoji: Any | None = None
-    sync: bool | None = None
-    file_type: str | None = None
+    is_linked: bool | None = Field(default=None, alias="is-linked")
+    is_shared: bool | None = Field(default=None, alias="is-shared")
 
     # counts / refs
-    test_count: int | None = None
-    filtered_tests: Any | None = None
+    test_count: float | None = Field(default=None, alias="test-count")
+    filtered_tests: Any | None = Field(default=None, alias="filtered-tests")
+    comments_count: float | None = Field(default=None, alias="comments-count")
 
     # file/meta
-    file: Any | None = None
+    code: str | None = None
+    file: str | None = None
+    fullpath: str | None = None
     notes: Any | None = None
-    created_at: str | None = None
-    updated_at: str | None = None
-    assigned_to: Any | None = None
-    to_url: str | None = None
-    comments_count: int | None = None
+    created_at: str | None = Field(default=None, alias="created-at")
+    updated_at: str | None = Field(default=None, alias="updated-at")
+    assigned_to: Any | None = Field(default=None, alias="assigned-to")
+    to_url: str | None = Field(default=None, alias="to-url")
     position: int | None = None
     depth: int | None = None
-    is_root: bool | None = None
-    public_title: str | None = None
-    parent_id: Any | None = None
+    is_root: bool | None = Field(default=None, alias="is-root")
+    public_title: str | None = Field(default=None, alias="public-title")
+    parent_id: Any | None = Field(default=None, alias="parent-id")
     path: Any | None = None
 
     # keep the whole original dict for forward-compatibility
     raw: dict[str, Any] | None = None
 
-    @staticmethod
-    def from_dict(data: dict[str, Any]) -> SuiteAttributes:
-        return SuiteAttributes(
-            labels=_get(data, "labels"),
-            tags=_get(data, "tags"),
-            issues=_get(data, "issues"),
-            jira_issues=_get(data, "jira-issues"),
-            is_branched=_get(data, "is-branched"),
-            is_detail=_get(data, "is-detail"),
-            attachments=_get(data, "attachments"),
-            is_linked=_get(data, "is-linked"),
-            is_shared=_get(data, "is-shared"),
-            title=_get(data, "title"),
-            emoji=_get(data, "emoji"),
-            sync=_get(data, "sync"),
-            file_type=_get(data, "file-type"),
-            test_count=_get(data, "test-count"),
-            filtered_tests=_get(data, "filtered-tests"),
-            file=_get(data, "file"),
-            notes=_get(data, "notes"),
-            created_at=_get(data, "created-at"),
-            updated_at=_get(data, "updated-at"),
-            assigned_to=_get(data, "assigned-to"),
-            to_url=_get(data, "to-url"),
-            comments_count=_get(data, "comments-count"),
-            position=_get(data, "position"),
-            depth=_get(data, "depth"),
-            is_root=_get(data, "is-root"),
-            public_title=_get(data, "public-title"),
-            parent_id=_get(data, "parent-id"),
-            path=_get(data, "path"),
-            raw=data,
-        )
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> SuiteAttributes:
+        payload = {**(data or {}), "raw": data}
+        return cls.model_validate(payload)
 
 
-@dataclass(frozen=True)
-class Suite:
+class Suite(BaseModel):
     """Single suite item inside response `data` list."""
+
+    model_config = ConfigDict(populate_by_name=True)
 
     id: str
     type: str
-    attributes: SuiteAttributes
+    attributes: SuiteAttributes = Field(default_factory=SuiteAttributes)
     relationships: dict[str, Any] | None = None
 
-    @staticmethod
-    def from_dict(data: dict[str, Any]) -> Suite:
-        attrs_raw = _get(data, "attributes") or {}
-        attrs = (
-            SuiteAttributes.from_dict(attrs_raw)
-            if isinstance(attrs_raw, dict)
-            else SuiteAttributes()
-        )
-        relationships = _get(data, "relationships") if isinstance(data, dict) else None
-        return Suite(
-            id=str(_get(data, "id")),
-            type=str(_get(data, "type")),
-            attributes=attrs,
-            relationships=relationships if isinstance(relationships, dict) else None,
-        )
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> Suite:
+        data = data or {}
+        attrs_raw = data.get("attributes")
+        if isinstance(attrs_raw, dict):
+            attrs = SuiteAttributes.from_dict(attrs_raw)
+        else:
+            attrs = SuiteAttributes()
+        payload = {**data, "attributes": attrs}
+        return cls.model_validate(payload)
+
+
+class SuitesMeta(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    total_pages: int | None = None
+    per_page: int | None = None
+    num: int | None = None
+    page: int | None = None
+    rId: Any | None = None
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> SuitesMeta:
+        return cls.model_validate(data or {})
+
+
+class SuitesResponse(BaseModel):
+    """Response for GET /api/{project_id}/suites."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    data: list[Suite] = Field(default_factory=list)
+    meta: SuitesMeta | None = None
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> SuitesResponse:
+        items = (data or {}).get("data")
+        suites: list[Suite] = []
+        if isinstance(items, list):
+            suites = [Suite.from_dict(x) for x in items if isinstance(x, dict)]
+
+        meta_raw = (data or {}).get("meta")
+        meta = SuitesMeta.from_dict(meta_raw) if isinstance(meta_raw, dict) else None
+
+        return cls.model_validate({"data": suites, "meta": meta})
+
+    @classmethod
+    def from_json(
+        cls,
+        payload: Any,
+    ) -> list[SuitesResponse] | SuitesResponse:
+        """Parse JSON payload into models (list or single object)."""
+        if isinstance(payload, list):
+            return [cls.from_dict(x) for x in payload if isinstance(x, dict)]
+        if isinstance(payload, dict):
+            return cls.from_dict(payload)
+        return cls.model_validate({"data": []})
+
+
+__all__ = [
+    "SuiteAttributes",
+    "Suite",
+    "SuitesMeta",
+    "SuitesResponse",
+]
