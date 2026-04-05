@@ -22,9 +22,11 @@ def test_get_suites_for_project(suite_controller, project_controller):
 def test_get_suite_by_id_for_a_project(suite_controller, project_controller):
     """Get a suite by id and validate pydantic model."""
     project = project_controller.random_project()
+    suite_controller.get_suites_for_project_id(project.id)
     rand_suite = suite_controller.random_suite(project.id)
     while rand_suite is None:
         project = project_controller.random_project()
+        suite_controller.get_suites_for_project_id(project.id)
         rand_suite = suite_controller.random_suite(project.id)
 
     suite = suite_controller.get_by_id_for_project_id(project.id, rand_suite.id)
@@ -44,6 +46,7 @@ def test_add_suite(suite_controller, project_controller):
     suite = suite_controller.add_suite(project.id, title=suite_title)
 
     assert suite.attributes.title == suite_title
+
     suites = suite_controller.get_suites_for_project_id(project.id)
     assert suite.id in (suite.id for suite in suites)
 

@@ -4,7 +4,7 @@ import pytest
 import requests
 
 from src.api import ApiClient
-from src.api.controllers import ProjectController, SuiteController
+from src.api.controllers import ProjectController, SuiteController, TestController
 
 from .config import Config
 
@@ -34,6 +34,16 @@ def project_controller(configs: Config, auth_token: str) -> ProjectController:
 @pytest.fixture(scope="session")
 def suite_controller(configs: Config, auth_token: str) -> SuiteController:
     controller = SuiteController(
+        base_url=configs.base_app_url,
+        api_token=configs.testomat_token,
+        jwt_token=auth_token,
+    )
+    yield controller
+
+
+@pytest.fixture(scope="session")
+def tests_controller(configs: Config, auth_token: str) -> TestController:
+    controller = TestController(
         base_url=configs.base_app_url,
         api_token=configs.testomat_token,
         jwt_token=auth_token,

@@ -29,11 +29,22 @@ class ProjectController(BaseController):
                 return project.id
         return ""
 
-    def random_project(self) -> Project:
-        """Return a random project."""
+    def random_project(self, with_tests: bool | None = None) -> Project:
+        """Return a random project, optionaly with or without tests."""
         if self.projects == []:
             self.get_all()
-        return random.choice(self.projects)
+        project = random.choice(self.projects)
+
+        if with_tests is None:
+            return project
+        elif with_tests:
+            while project.attributes.tests_count == 0:
+                project = random.choice(self.projects)
+            return project
+        else:
+            while project.attributes.tests_count > 0:
+                project = random.choice(self.projects)
+            return project
 
     def delete_project(self, project_id: str):
         """Delete a project via DELETE /api/projects/{project_id}"""

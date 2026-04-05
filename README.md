@@ -6,48 +6,77 @@ Playwright-based end-to-end and API testing framework for the Testomat applicati
 
 ```
 testomat_tests/
-├── src/                          # Source code
-│   ├── api/                      # Lightweight API client and models
-│   │   ├── client.py
-│   │   └── models/
-│   └── web/                      # Web UI automation (Playwright sync API)
-│       ├── application.py        # Application facade (entry point)
-│       ├── pages/                # Page Object Models (POM)
+├── src/                               # Source code
+│   ├── api/                           # API layer (client + MVC for API tests)
+│   │   ├── client.py                  # Low-level API client (used across project)
+│   │   ├── controllers/               # Controllers (C in MVC) – API use-cases
+│   │   │   ├── base_controller.py
+│   │   │   ├── project_controller.py
+│   │   │   ├── suite_controller.py
+│   │   │   └── tests_controller.py
+│   │   └── models/                    # Pydantic models (M in MVC)
+│   │       ├── models.py              # Base/commons for models
+│   │       ├── project.py
+│   │       ├── suite.py
+│   │       └── test.py
+│   └── web/                           # Web UI automation (Playwright sync API)
+│       ├── application.py             # Application facade (entry point)
+│       ├── pages/                     # Page Object Models (POM)
 │       │   ├── home_page.py
 │       │   ├── login_page.py
 │       │   ├── projects_page.py
 │       │   ├── new_project_page.py
 │       │   └── project_page.py
-│       └── components/           # Reusable UI components
+│       └── components/                # Reusable UI components
 │           ├── header_nav.py
 │           ├── project_card.py
 │           ├── side_bar_nav.py
+│           ├── project_page_readme_block.py
+│           ├── project_page_tests_tab.py
 │           └── suite_creation_form.py
 │
-├── tests/                        # Test suites and fixtures
-│   ├── conftest.py               # Pytest config and plugins loader
-│   ├── fixtures/                 # Shared fixtures and settings
-│   │   ├── app.py                # App/contexts, tracing, auth state
-│   │   ├── config.py             # Browser/context args, .env configs
-│   │   ├── playwright.py         # Browser session fixture
-│   │   └── api.py                # API fixtures
-│   ├── web/                      # Web UI tests
+├── tests/                             # Test suites and fixtures
+│   ├── conftest.py                    # Pytest config and plugins loader
+│   ├── fixtures/                      # Shared fixtures and settings
+│   │   ├── app.py                     # App/contexts, tracing, auth state
+│   │   ├── config.py                  # Browser/context args, .env configs
+│   │   ├── playwright.py              # Browser session fixture
+│   │   ├── selenium.py                # Selenium session fixture
+│   │   └── api.py                     # API fixtures (wires client + controllers)
+│   ├── web/                           # Web UI tests (Playwright + Selenium)
 │   │   ├── login_page_tests.py
 │   │   ├── cookies_tests.py
-│   │   ├── free_plan/            # Free plan subset
-│   │   └── enterprise_plan/      # Enterprise plan subset
-│   └── api/                      # API tests
-│       └── api_tests.py
+│   │   ├── selenium/                  # Selenium-marked UI tests
+│   │   │   ├── selenium_login_tests.py
+│   │   │   ├── selenium_projects_page_tests.py
+│   │   │   └── simple_test_via_selenium.py
+│   │   ├── free_plan/
+│   │   └── enterprise_plan/
+│   └── api/                           # API tests (use MVC controllers + models)
+│       ├── api_tests.py
+│       ├── projects_tests.py
+│       ├── suites_tests.py
+│       └── tests_tests.py
 │
-├── test-result/                  # Test artifacts (created on first run)
-│   ├── report.html               # Pytest HTML report (self-contained)
-│   ├── traces/                   # Playwright traces (on failure)
-│   └── videos/                   # Optional video recordings
+├── test-result/                       # Test artifacts (created on first run)
+│   ├── report.html                    # Pytest HTML report (self-contained)
+│   ├── traces/                        # Playwright traces (on failure)
+│   └── videos/                        # Optional video recordings
 │
-├── .env                          # Environment configuration (create locally)
-├── pyproject.toml                # Project configuration (deps, pytest, ruff)
-└── uv.lock                       # Dependency lock file (if using uv)
+├── testomat_api.yaml                  # OpenAPI schema (reference)
+├── .env                               # Environment configuration (create locally)
+├── pyproject.toml                     # Project configuration (deps, pytest, ruff)
+└── uv.lock                            # Dependency lock file (if using uv)
 ```
+
+Notes about API layer usage
+
+- The low-level `src/api/client.py` API client is reused across the project, including within UI tests, to set up or
+  clean up preconditions (e.g., creating projects, suites, or tests via API before visiting pages). This keeps UI flows
+  fast and focused on UI assertions instead of data creation.
+- API tests follow an MVC-like structure: Pydantic models under `src/api/models` represent data (M), while
+  `src/api/controllers/*_controller.py` encapsulate higher-level operations (C). The tests in `tests/api/` call these
+  controllers and validate responses via the models. There is no separate View layer for API tests.
 
 ## Requirements
 
