@@ -53,5 +53,39 @@ class SuiteController(BaseController):
         response = self._post(f"/api/{project_id}/suites", data=payload)
         return Suite.model_validate(response.get("data"))
 
+    def update_suite(
+        self,
+        project_id: str,
+        suite_id: str,
+        title: str | None = None,
+        description: str | None = None,
+        attributes: dict[str, object] | None = None,
+    ) -> Suite:
+        """Update a suite modifying only attributes according to arguments.
+
+        Args:
+            project_id: Target project id.
+            suite_id: Suite id to update.
+            title: Optional new title.
+            description: Optional new description.
+            attributes: Optional dict with any other attributes to update (by API field names).
+
+        Returns:
+            Updated `Suite` model.
+        """
+
+        attrs: dict[str, object] = {}
+        if title is not None:
+            attrs["title"] = title
+        if description is not None:
+            attrs["description"] = description
+        if attributes:
+            attrs.update(attributes)
+
+        payload = {"data": {"type": "suite", "id": "", "attributes": attrs}}
+        response = self._put(f"/api/{project_id}/suites/{suite_id}", data=payload)
+        return Suite.model_validate(response.get("data"))
+
     def delete_by_id_for_project_id(self, project_id: str, suite_id: str) -> Suite:
+        """Delete a suite via DELETE /api/{project_id}/suites/{suite_id}"""
         self._delete(f"/api/{project_id}/suites/{suite_id}")

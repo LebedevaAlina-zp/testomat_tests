@@ -53,6 +53,28 @@ def test_add_suite(suite_controller, project_controller):
 
 @pytest.mark.api
 @pytest.mark.smoke
+def test_add_suite_with_description(suite_controller, project_controller):
+    """Create a suite with valid attributes."""
+    project = project_controller.random_project()
+
+    suite_title = Faker().sentence()
+    description = Faker().paragraph(nb_sentences=3)
+    suite = suite_controller.add_suite(
+        project.id, title=suite_title, description=description
+    )
+
+    assert suite.attributes.title == suite_title
+    assert suite.attributes.description == description
+    # Get suites list to check whether created suite is in there
+    suites = suite_controller.get_suites_for_project_id(project.id)
+    assert suite.id in (suite.id for suite in suites)
+
+    # Clean up
+    suite_controller.delete_by_id_for_project_id(project.id, suite.id)
+
+
+@pytest.mark.api
+@pytest.mark.smoke
 def test_delete_suite(suite_controller, project_controller):
     """Delete a suite."""
 
@@ -67,3 +89,61 @@ def test_delete_suite(suite_controller, project_controller):
     assert suite.id not in (
         suite.id for suite in suite_controller.get_suites_for_project_id(project.id)
     )
+
+
+@pytest.mark.api
+@pytest.mark.smoke
+def test_update_suite_title(suite_controller, project_controller):
+    """Update a suite title, validate pydantic model, check other attributes haven't changed"""
+    # Create a suite for a random project
+    project = project_controller.random_project()
+    suite = suite_controller.add_suite(
+        project.id, title=Faker().company(), description=Faker().sentence()
+    )
+
+    # Update the suite
+    upd_title = f"{suite.attributes.title}_updated"
+    updated_suite = suite_controller.update_suite(
+        project.id,
+        suite.id,
+        title=upd_title,
+    )
+
+    # Check id hasn't changed
+    assert updated_suite.id == suite.id
+    # Get updated  suite by id
+    get_upd_suite = suite_controller.get_by_id_for_project_id(project.id, suite.id)
+    assert get_upd_suite.attributes.title == upd_title
+    assert get_upd_suite.attributes.description == suite.attributes.description
+
+    # Clean up
+    suite_controller.delete_by_id_for_project_id(project.id, suite.id)
+
+
+@pytest.mark.api
+@pytest.mark.smoke
+def test_update_suite_description(suite_controller, project_controller):
+    """Update a suite description, validate pydantic model, check other attributes haven't changed"""
+    # Create a suite for a random project
+    project = project_controller.random_project()
+    suite = suite_controller.add_suite(
+        project.id, title=Faker().company(), description=Faker().sentence()
+    )
+
+    upd_description = Faker().sentence()
+    upd_suite = suite_controller.update_suite(
+        project.id,
+        suite.id,
+        description=upd_description,
+    )
+
+    # Check id hasn't changed
+    assert upd_suite.id == suite.id
+
+    # Get updated suite by id
+    get_upd_suite = suite_controller.get_by_id_for_project_id(project.id, suite.id)
+    assert get_upd_suite.attributes.title == suite.attributes.title
+    assert get_upd_suite.attributes.description == upd_description
+
+    # Clean up
+    suite_controller.delete_by_id_for_project_id(project.id, suite.id)
