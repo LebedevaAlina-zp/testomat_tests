@@ -26,9 +26,10 @@ def test_get_tests_for_suite(tests_controller, project_controller, suite_control
 
     # Find a suite in the project with tests
     suite_controller.get_suites_for_project_id(project.id)
-    suite = suite_controller.random_suite(project.id)
-    while suite.attributes.test_count == 0:
-        suite = suite_controller.random_suite(project.id)
+    random.shuffle(suite_controller.suites)
+    for suite in suite_controller.suites:
+        if suite.attributes.test_count > 0:
+            break
 
     tests_list = tests_controller.get_tests_for_suite(project.id, suite.id)
 
@@ -55,12 +56,14 @@ def test_get_test_by_id(tests_controller, project_controller):
 def test_add_test(tests_controller, suite_controller, project_controller):
     """Create a test with valid attributes."""
 
-    # Find a project with suites
-    project = project_controller.random_project()
-    suite_controller.get_suites_for_project_id(project.id)
-    while len(suite_controller.suites) == 0:
-        project = project_controller.random_project()
-        suite_controller.get_suites_for_project_id(project.id)
+    # Find a random project that has suites
+    if len(project_controller.projects) == 0:
+        project_controller.get_all()
+    random.shuffle(project_controller.projects)
+
+    for project in project_controller.projects:
+        if len(suite_controller.get_suites_for_project_id(project.id)) > 0:
+            break
 
     suite = suite_controller.random_suite(project.id)
 

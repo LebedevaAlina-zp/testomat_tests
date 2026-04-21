@@ -1,3 +1,5 @@
+import random
+
 import pytest
 from faker import Faker
 
@@ -21,13 +23,15 @@ def test_get_suites_for_project(suite_controller, project_controller):
 @pytest.mark.smoke
 def test_get_suite_by_id_for_a_project(suite_controller, project_controller):
     """Get a suite by id and validate pydantic model."""
-    project = project_controller.random_project()
-    suite_controller.get_suites_for_project_id(project.id)
-    rand_suite = suite_controller.random_suite(project.id)
-    while rand_suite is None:
-        project = project_controller.random_project()
-        suite_controller.get_suites_for_project_id(project.id)
-        rand_suite = suite_controller.random_suite(project.id)
+    # Find a random project that has suites
+    if len(project_controller.projects) == 0:
+        project_controller.get_all()
+    random.shuffle(project_controller.projects)
+
+    for project in project_controller.projects:
+        if len(suite_controller.get_suites_for_project_id(project.id)) > 0:
+            rand_suite = suite_controller.random_suite(project.id)
+            break
 
     suite = suite_controller.get_by_id_for_project_id(project.id, rand_suite.id)
 
