@@ -13,11 +13,6 @@ on:
 permissions:
   contents: read  # minimal permissions
 
-env:
-  # Cache keys
-  UV_CACHE_KEY: uv-${{ runner.os }}-${{ hashFiles('uv.lock', 'pyproject.toml') }}
-  PW_CACHE_KEY: pw-${{ runner.os }}-chromium
-
 jobs:
   linter:
     name: Lint (ruff)

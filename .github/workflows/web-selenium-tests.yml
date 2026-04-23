@@ -13,10 +13,6 @@ on:
 permissions:
   contents: read  # minimal permissions
 
-env:
-  # Cache key for uv (includes OS and lock/hash)
-  UV_CACHE_KEY: uv-${{ runner.os }}-${{ hashFiles('uv.lock', 'pyproject.toml') }}
-
 jobs:
   linter:
     name: Lint (ruff)
