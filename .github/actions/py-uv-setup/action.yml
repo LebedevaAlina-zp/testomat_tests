@@ -65,7 +65,7 @@ runs:
     - name: Install Playwright dependencies and Chromium
       if: ${{ inputs.install-playwright == 'true' }}
       shell: bash
-      run: python -m playwright install --with-deps chromium
+      run: uv run playwright install --with-deps chromium
 
     - name: Install Chrome (for Selenium)
       if: ${{ inputs.install-chrome == 'true' }}
