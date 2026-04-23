@@ -66,7 +66,7 @@ jobs:
           install-chrome: 'true'
 
       - name: Run smoke tests (Selenium)
-        run: uv run pytest -m "web and smoke and selenium"
+        run: uv run pytest -m "smoke and selenium"
 
       - name: Upload HTML report (always)
         if: always()
@@ -98,7 +98,7 @@ jobs:
           install-chrome: 'true'
 
       - name: Run regression tests (Selenium)
-        run: uv run pytest -m "web and regression and selenium"
+        run: uv run pytest -m "regression and selenium"
 
       - name: Upload HTML report (always)
         if: always()

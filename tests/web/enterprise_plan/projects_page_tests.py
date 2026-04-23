@@ -8,10 +8,7 @@ from playwright.sync_api import expect
 def test_valid_project_search(logged_app):
     valid_project_search = "Industrial"
 
-    (logged_app.projects_page.open()
-     .is_loaded()
-     .search_project(valid_project_search)
-    )
+    (logged_app.projects_page.open().is_loaded().search_project(valid_project_search))
 
     # Check that only projects which contain the search line are visible
     for project in logged_app.projects_page.get_projects():
@@ -26,10 +23,7 @@ def test_valid_project_search(logged_app):
 def test_invalid_project_search(logged_app):
     invalid_project_search = Faker().password(length=6)  # "lklfs;lfk"
 
-    (logged_app.projects_page.open()
-     .is_loaded()
-     .search_project(invalid_project_search)
-    )
+    (logged_app.projects_page.open().is_loaded().search_project(invalid_project_search))
 
     expect(logged_app.projects_page.project_cards.filter(visible=True)).to_have_count(0)
 
@@ -53,7 +47,7 @@ def test_projects_company_switch(logged_app):
     projects_page.expect_current_subscription(default_subscription)
 
     projects_page.current_subscription.hover(timeout=1000)
-    expect(projects_page.page.get_by_text(enterprise_hint_message)).to_be_visible
+    expect(projects_page.page.get_by_text(enterprise_hint_message)).to_be_visible()
 
     projects_page.select_company(projects_page.company_options.free_projects)
 
@@ -63,4 +57,4 @@ def test_projects_company_switch(logged_app):
     expect(projects_page.create_company_btn).to_be_visible()
 
     projects_page.current_subscription.hover(timeout=2000)
-    expect(projects_page.page.get_by_text(free_plan_hint_message)).to_be_visible
+    expect(projects_page.page.get_by_text(free_plan_hint_message)).to_be_visible()

@@ -66,9 +66,7 @@ def test_add_suite_with_description(suite_controller, project_controller):
 
     suite_title = Faker().sentence()
     description = Faker().paragraph(nb_sentences=3)
-    suite = suite_controller.add_suite(
-        project.id, title=suite_title, description=description
-    )
+    suite = suite_controller.add_suite(project.id, title=suite_title, description=description)
 
     assert suite.attributes.title == suite_title
     assert suite.attributes.description == description
@@ -101,7 +99,10 @@ def test_delete_suite(suite_controller, project_controller):
 @pytest.mark.api
 @pytest.mark.regression
 def test_update_suite_title(suite_controller, project_controller):
-    """Update a suite title, validate pydantic model, check other attributes haven't changed"""
+    """
+    Update a suite title, validate pydantic model,
+    check other attributes haven't changed.
+    """
     # Create a suite for a random project
     project = project_controller.random_project()
     suite = suite_controller.add_suite(
@@ -130,7 +131,10 @@ def test_update_suite_title(suite_controller, project_controller):
 @pytest.mark.api
 @pytest.mark.regression
 def test_update_suite_description(suite_controller, project_controller):
-    """Update a suite description, validate pydantic model, check other attributes haven't changed"""
+    """
+    Update a suite description, validate pydantic model,
+    check other attributes haven't changed.
+    """
     # Create a suite for a random project
     project = project_controller.random_project()
     suite = suite_controller.add_suite(

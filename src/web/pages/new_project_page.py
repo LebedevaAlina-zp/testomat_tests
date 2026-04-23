@@ -40,7 +40,12 @@ class NewProjectPage:
         expect(self.create_project_button).to_be_visible()
         return self
 
-    def create_new_project(self, project_title: str, project_type: ProjectType, fill_demo: bool = False) -> Self:
+    def create_new_project(
+        self,
+        project_title: str,
+        project_type: ProjectType,
+        fill_demo: bool = False,
+    ) -> Self:
         if project_type == ProjectType.CLASSICAL:
             self.project_type_classical.click()
         elif project_type == ProjectType.BDD:

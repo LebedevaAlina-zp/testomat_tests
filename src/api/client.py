@@ -70,8 +70,8 @@ class ApiClient:
         resp.raise_for_status()
         try:
             payload = resp.json()
-        except ValueError:
-            raise requests.HTTPError("Login response is not JSON", response=resp)
+        except ValueError as err:
+            raise requests.HTTPError("Login response is not JSON", response=resp) from err
 
         token = payload.get("jwt") if isinstance(payload, dict) else None
         if not token or not isinstance(token, str):
@@ -140,12 +140,7 @@ class ApiClient:
         # or a project with suites
         for project in projects_list:
             suites_count = len(self.suites_list(project.id))
-            if (
-                suites_count == 0
-                and empty is True
-                or suites_count > 0
-                and empty is False
-            ):
+            if suites_count == 0 and empty is True or suites_count > 0 and empty is False:
                 return project.id
         raise Exception("No projects matching the conditions was found")
 
