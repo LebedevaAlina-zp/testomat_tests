@@ -25,6 +25,9 @@ jobs:
       PASSWORD: ${{ secrets.PASSWORD }}
       TESTOMAT_TOKEN: ${{ secrets.TESTOMAT_TOKEN }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Setup (Python + uv + Playwright)
         uses: ./.github/actions/py-uv-setup
         with:
@@ -63,6 +66,9 @@ jobs:
       PASSWORD: ${{ secrets.PASSWORD }}
       TESTOMAT_TOKEN: ${{ secrets.TESTOMAT_TOKEN }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Setup (Python + uv + Playwright)
         uses: ./.github/actions/py-uv-setup
         with:
@@ -101,6 +107,9 @@ jobs:
       PASSWORD: ${{ secrets.PASSWORD }}
       TESTOMAT_TOKEN: ${{ secrets.TESTOMAT_TOKEN }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Setup (Python + uv + Playwright)
         uses: ./.github/actions/py-uv-setup
         with:
