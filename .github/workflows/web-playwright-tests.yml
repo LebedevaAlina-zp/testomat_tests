@@ -1,0 +1,133 @@
+name: Web Playwright CI
+
+# Triggers:
+# - pull_request: run linter and smoke only (regression job is skipped by its if-condition)
+# - schedule: run all three daily at 05:00 UTC (08:00 Europe/Kyiv)
+# - workflow_dispatch: run all three when started manually
+on:
+  pull_request:
+  schedule:
+    - cron: '0 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read  # minimal permissions
+
+env:
+  # Cache keys
+  UV_CACHE_KEY: uv-${{ runner.os }}-${{ hashFiles('uv.lock', 'pyproject.toml') }}
+  PW_CACHE_KEY: pw-${{ runner.os }}-chromium
+
+jobs:
+  linter:
+    name: Lint (ruff)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BASE_URL: ${{ secrets.BASE_URL }}
+      BASE_APP_URL: ${{ secrets.BASE_APP_URL }}
+      EMAIL: ${{ secrets.EMAIL }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+      TESTOMAT_TOKEN: ${{ secrets.TESTOMAT_TOKEN }}
+    steps:
+      - name: Setup (Python + uv + Playwright)
+        uses: ./.github/actions/py-uv-setup
+        with:
+          dev-deps: 'true'
+          install-playwright: 'true'
+
+      - name: Ruff check
+        run: uv run ruff check .
+
+      - name: Upload HTML report (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-playwright-report
+          path: test-result/report.html
+          if-no-files-found: ignore
+          retention-days: 3
+
+      - name: Upload Playwright traces (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-playwright-traces
+          path: test-result/traces
+          if-no-files-found: ignore
+          retention-days: 3
+
+  smoke-web-playwright:
+    name: Smoke - Web (Playwright Chromium)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BASE_URL: ${{ secrets.BASE_URL }}
+      BASE_APP_URL: ${{ secrets.BASE_APP_URL }}
+      EMAIL: ${{ secrets.EMAIL }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+      TESTOMAT_TOKEN: ${{ secrets.TESTOMAT_TOKEN }}
+    steps:
+      - name: Setup (Python + uv + Playwright)
+        uses: ./.github/actions/py-uv-setup
+        with:
+          install-playwright: 'true'
+
+      - name: Run smoke tests (Playwright)
+        run: uv run pytest -m "web and smoke and not selenium"
+
+      - name: Upload HTML report (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-playwright-report
+          path: test-result/report.html
+          if-no-files-found: ignore
+          retention-days: 3
+
+      - name: Upload Playwright traces (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-playwright-traces
+          path: test-result/traces
+          if-no-files-found: ignore
+          retention-days: 3
+
+  regression-web-playwright:
+    name: Regression - Web (Playwright Chromium)
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BASE_URL: ${{ secrets.BASE_URL }}
+      BASE_APP_URL: ${{ secrets.BASE_APP_URL }}
+      EMAIL: ${{ secrets.EMAIL }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+      TESTOMAT_TOKEN: ${{ secrets.TESTOMAT_TOKEN }}
+    steps:
+      - name: Setup (Python + uv + Playwright)
+        uses: ./.github/actions/py-uv-setup
+        with:
+          install-playwright: 'true'
+
+      - name: Run regression tests (Playwright)
+        run: uv run pytest -m "web and regression and not selenium"
+
+      - name: Upload HTML report (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-playwright-report
+          path: test-result/report.html
+          if-no-files-found: ignore
+          retention-days: 3
+
+      - name: Upload Playwright traces (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-playwright-traces
+          path: test-result/traces
+          if-no-files-found: ignore
+          retention-days: 3

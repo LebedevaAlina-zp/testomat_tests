@@ -59,7 +59,7 @@ def test_add_suite(suite_controller, project_controller):
 
 
 @pytest.mark.api
-@pytest.mark.smoke
+@pytest.mark.regression
 def test_add_suite_with_description(suite_controller, project_controller):
     """Create a suite with valid attributes."""
     project = project_controller.random_project()
@@ -99,7 +99,7 @@ def test_delete_suite(suite_controller, project_controller):
 
 
 @pytest.mark.api
-@pytest.mark.smoke
+@pytest.mark.regression
 def test_update_suite_title(suite_controller, project_controller):
     """Update a suite title, validate pydantic model, check other attributes haven't changed"""
     # Create a suite for a random project
@@ -128,7 +128,7 @@ def test_update_suite_title(suite_controller, project_controller):
 
 
 @pytest.mark.api
-@pytest.mark.smoke
+@pytest.mark.regression
 def test_update_suite_description(suite_controller, project_controller):
     """Update a suite description, validate pydantic model, check other attributes haven't changed"""
     # Create a suite for a random project

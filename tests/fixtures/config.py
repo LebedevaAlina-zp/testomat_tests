@@ -19,9 +19,11 @@ FREE_PROJECT_STORAGE_STATE = Path(
 VIDEO_DIR = TEST_RESULT_DIR / "videos"
 TRACES_DIR = TEST_RESULT_DIR / "traces"
 
+headless = os.getenv("CI", "false").lower() == "true"
+
 BROWSER_LAUNCH_ARGS = {
-    "channel": "chrome",
-    "headless": False,
+    "channel": "chromium",
+    "headless": headless,
     "slow_mo": 0,
     "timeout": 120000,
 }

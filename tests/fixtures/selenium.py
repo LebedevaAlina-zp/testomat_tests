@@ -1,9 +1,11 @@
 import json
+import os
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.ie.webdriver import WebDriver
 
 from src.web.selenium.pages import LoginPage, ProjectsPage
@@ -13,10 +15,19 @@ from .config import Config
 AUTH_STATE_COOKIES = Path("tests/.auth_state/selenium/auth_state.json")
 FREE_PLAN_STATE_COOKIES = Path("tests/.auth_state/selenium/free_plan_state.json")
 
+CI = os.getenv("CI", "false").lower() == "true"
+
 
 @pytest.fixture(scope="function")
 def driver() -> WebDriver:
-    driver = webdriver.Chrome()
+    options = Options()
+    if CI:
+        options.add_argument("--headless=new")
+        options.add_argument("--no-sandbox")  # required in many Linux CI envs
+        options.add_argument("--disable-dev-shm-usage")  # avoid /dev/shm issues
+        options.add_argument("--disable-gpu")  # harmless on Linux, prevents issues
+
+    driver = webdriver.Chrome(options=options)
     driver.implicitly_wait(0)
     driver.set_window_size(1540, 820)
     yield driver

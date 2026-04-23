@@ -100,7 +100,7 @@ def test_delete_test(tests_controller, suite_controller, project_controller):
 
 
 @pytest.mark.api
-@pytest.mark.smoke
+@pytest.mark.regression
 def test_update_test_title(tests_controller, suite_controller, project_controller):
     """Update a test's title, validate pydantic model, check other attributes haven't changed"""
 
