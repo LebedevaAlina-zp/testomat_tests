@@ -41,7 +41,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: web-playwright-report
+          name: web-playwright-report-linter
           path: test-result/report.html
           if-no-files-found: ignore
           retention-days: 3
@@ -81,7 +81,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: web-playwright-report
+          name: web-playwright-report-smoke
           path: test-result/report.html
           if-no-files-found: ignore
           retention-days: 3
@@ -122,7 +122,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: web-playwright-report
+          name: web-playwright-report-regression
           path: test-result/report.html
           if-no-files-found: ignore
           retention-days: 3
