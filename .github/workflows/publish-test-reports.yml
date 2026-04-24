@@ -44,8 +44,8 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           workflow: .github/workflows/web-api-tests.yml
           commit: ${{ github.event.workflow_run.head_sha || github.sha }}
-          name: web-api-report-smoke
-          if_no_artifact: ignore
+          name: web-api-allure-smoke
+          if_no_artifact_found: ignore
           path: downloads/api/smoke
 
       - name: Download API regression report
@@ -54,8 +54,8 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           workflow: .github/workflows/web-api-tests.yml
           commit: ${{ github.event.workflow_run.head_sha || github.sha }}
-          name: web-api-report-regression
-          if_no_artifact: ignore
+          name: web-api-allure-regression
+          if_no_artifact_found: ignore
           path: downloads/api/regression
 
       - name: Download Playwright smoke report
@@ -64,8 +64,8 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           workflow: .github/workflows/web-playwright-tests.yml
           commit: ${{ github.event.workflow_run.head_sha || github.sha }}
-          name: web-playwright-report-smoke
-          if_no_artifact: ignore
+          name: web-playwright-allure-smoke
+          if_no_artifact_found: ignore
           path: downloads/playwright/smoke
 
       - name: Download Playwright regression report
@@ -74,8 +74,8 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           workflow: .github/workflows/web-playwright-tests.yml
           commit: ${{ github.event.workflow_run.head_sha || github.sha }}
-          name: web-playwright-report-regression
-          if_no_artifact: ignore
+          name: web-playwright-allure-regression
+          if_no_artifact_found: ignore
           path: downloads/playwright/regression
 
       - name: Download Selenium smoke report
@@ -84,8 +84,8 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           workflow: .github/workflows/web-selenium-tests.yml
           commit: ${{ github.event.workflow_run.head_sha || github.sha }}
-          name: web-selenium-report-smoke
-          if_no_artifact: ignore
+          name: web-selenium-allure-smoke
+          if_no_artifact_found: ignore
           path: downloads/selenium/smoke
 
       - name: Download Selenium regression report
@@ -94,9 +94,19 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           workflow: .github/workflows/web-selenium-tests.yml
           commit: ${{ github.event.workflow_run.head_sha || github.sha }}
-          name: web-selenium-report-regression
-          if_no_artifact: ignore
+          name: web-selenium-allure-regression
+          if_no_artifact_found: ignore
           path: downloads/selenium/regression
+
+      - name: Setup Java (for Allure)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Allure CLI
+        run: |
+          npm i -g allure-commandline@2.x
 
       - name: Assemble site structure
         run: |
@@ -106,25 +116,30 @@ jobs:
           mkdir -p "site/${DATE_TAG}/playwright/smoke" "site/${DATE_TAG}/playwright/regression"
           mkdir -p "site/${DATE_TAG}/selenium/smoke" "site/${DATE_TAG}/selenium/regression"
 
-          copy_or_fallback() {
+          generate_or_fallback() {
             src_dir="$1"; dest_dir="$2"; title="$3";
             mkdir -p "$dest_dir"
-            if [ -f "$src_dir/report.html" ]; then
-              cp "$src_dir/report.html" "$dest_dir/index.html"
+            if compgen -G "$src_dir/*.json" > /dev/null || compgen -G "$src_dir/*.xml" > /dev/null; then
+              allure generate "$src_dir" --clean -o "$dest_dir" || {
+                printf '%s\n' "<!doctype html>" \
+                  "<html><head><meta charset=\"utf-8\"><title>${title}</title></head>" \
+                  "<body><h1>${title}</h1><p>Failed to build Allure report.</p></body></html>" \
+                  >"$dest_dir/index.html"
+              }
             else
               printf '%s\n' "<!doctype html>" \
                 "<html><head><meta charset=\"utf-8\"><title>${title}</title></head>" \
-                "<body><h1>${title}</h1><p>No report was produced for this run.</p></body></html>" \
+                "<body><h1>${title}</h1><p>No Allure results were produced for this run.</p></body></html>" \
                 >"$dest_dir/index.html"
             fi
           }
 
-          copy_or_fallback downloads/api/smoke      "site/${DATE_TAG}/api/smoke"               "API Smoke Report (${DATE_TAG})"
-          copy_or_fallback downloads/api/regression "site/${DATE_TAG}/api/regression"          "API Regression Report (${DATE_TAG})"
-          copy_or_fallback downloads/playwright/smoke      "site/${DATE_TAG}/playwright/smoke"  "Playwright Smoke Report (${DATE_TAG})"
-          copy_or_fallback downloads/playwright/regression "site/${DATE_TAG}/playwright/regression" "Playwright Regression Report (${DATE_TAG})"
-          copy_or_fallback downloads/selenium/smoke      "site/${DATE_TAG}/selenium/smoke"      "Selenium Smoke Report (${DATE_TAG})"
-          copy_or_fallback downloads/selenium/regression "site/${DATE_TAG}/selenium/regression" "Selenium Regression Report (${DATE_TAG})"
+          generate_or_fallback downloads/api/smoke      "site/${DATE_TAG}/api/smoke"               "API Smoke Report (${DATE_TAG})"
+          generate_or_fallback downloads/api/regression "site/${DATE_TAG}/api/regression"          "API Regression Report (${DATE_TAG})"
+          generate_or_fallback downloads/playwright/smoke      "site/${DATE_TAG}/playwright/smoke"  "Playwright Smoke Report (${DATE_TAG})"
+          generate_or_fallback downloads/playwright/regression "site/${DATE_TAG}/playwright/regression" "Playwright Regression Report (${DATE_TAG})"
+          generate_or_fallback downloads/selenium/smoke      "site/${DATE_TAG}/selenium/smoke"      "Selenium Smoke Report (${DATE_TAG})"
+          generate_or_fallback downloads/selenium/regression "site/${DATE_TAG}/selenium/regression" "Selenium Regression Report (${DATE_TAG})"
 
           # latest redirects
           make_redirect() {

@@ -36,12 +36,12 @@ jobs:
       - name: Ruff check
         run: uv run ruff check .
 
-      - name: Upload HTML report (always)
+      - name: Upload Allure results (always)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: web-api-report-linter
-          path: test-result/report.html
+          name: web-api-allure-linter
+          path: test-result/allure-results
           if-no-files-found: ignore
           retention-days: 3
 
@@ -65,12 +65,12 @@ jobs:
       - name: Run smoke tests (API)
         run: uv run pytest -m "api and smoke"
 
-      - name: Upload HTML report (always)
+      - name: Upload Allure results (always)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: web-api-report-smoke
-          path: test-result/report.html
+          name: web-api-allure-smoke
+          path: test-result/allure-results
           if-no-files-found: ignore
           retention-days: 3
 
@@ -95,11 +95,11 @@ jobs:
       - name: Run regression tests (API)
         run: uv run pytest -m "api and regression"
 
-      - name: Upload HTML report (always)
+      - name: Upload Allure results (always)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: web-api-report-regression
-          path: test-result/report.html
+          name: web-api-allure-regression
+          path: test-result/allure-results
           if-no-files-found: ignore
           retention-days: 3

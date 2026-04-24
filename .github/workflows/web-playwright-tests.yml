@@ -37,12 +37,12 @@ jobs:
       - name: Ruff check
         run: uv run ruff check .
 
-      - name: Upload HTML report (always)
+      - name: Upload Allure results (always)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: web-playwright-report-linter
-          path: test-result/report.html
+          name: web-playwright-allure-linter
+          path: test-result/allure-results
           if-no-files-found: ignore
           retention-days: 3
 
@@ -77,12 +77,12 @@ jobs:
       - name: Run smoke tests (Playwright)
         run: uv run pytest -m "web and smoke and not selenium"
 
-      - name: Upload HTML report (always)
+      - name: Upload Allure results (always)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: web-playwright-report-smoke
-          path: test-result/report.html
+          name: web-playwright-allure-smoke
+          path: test-result/allure-results
           if-no-files-found: ignore
           retention-days: 3
 
@@ -118,12 +118,12 @@ jobs:
       - name: Run regression tests (Playwright)
         run: uv run pytest -m "web and regression and not selenium"
 
-      - name: Upload HTML report (always)
+      - name: Upload Allure results (always)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: web-playwright-report-regression
-          path: test-result/report.html
+          name: web-playwright-allure-regression
+          path: test-result/allure-results
           if-no-files-found: ignore
           retention-days: 3
 

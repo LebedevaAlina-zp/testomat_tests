@@ -37,12 +37,12 @@ jobs:
       - name: Ruff check
         run: uv run ruff check .
 
-      - name: Upload HTML report (always)
+      - name: Upload Allure results (always)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: web-selenium-report-linter
-          path: test-result/report.html
+          name: web-selenium-allure-linter
+          path: test-result/allure-results
           if-no-files-found: ignore
           retention-days: 3
 
@@ -68,12 +68,12 @@ jobs:
       - name: Run smoke tests (Selenium)
         run: uv run pytest -m "smoke and selenium"
 
-      - name: Upload HTML report (always)
+      - name: Upload Allure results (always)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: web-selenium-report-smoke
-          path: test-result/report.html
+          name: web-selenium-allure-smoke
+          path: test-result/allure-results
           if-no-files-found: ignore
           retention-days: 3
 
@@ -100,11 +100,11 @@ jobs:
       - name: Run regression tests (Selenium)
         run: uv run pytest -m "regression and selenium"
 
-      - name: Upload HTML report (always)
+      - name: Upload Allure results (always)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: web-selenium-report-regression
-          path: test-result/report.html
+          name: web-selenium-allure-regression
+          path: test-result/allure-results
           if-no-files-found: ignore
           retention-days: 3
