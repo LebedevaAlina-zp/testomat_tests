@@ -52,16 +52,11 @@ def expires_in_x_seconds(storage_state_path: Path, x: int = 60) -> bool:
     for cookie in storage_state.get("cookies", []):
         if cookie.get("expires"):
             expires_at = datetime.fromtimestamp(cookie["expires"], UTC)
-            if expires_at - timedelta(seconds=x) <= now:
-                return True
-            else:
-                return False
+            return expires_at - timedelta(seconds=x) <= now
     return True
 
 
-def generate_free_plan_storage_state(
-    storage_state: Path, free_plan_storage_state: Path
-) -> None:
+def generate_free_plan_storage_state(storage_state: Path, free_plan_storage_state: Path) -> None:
     """Creates a storage state file for a free plan logged-in user
     based on an existing storage state with a default plan."""
 
@@ -100,15 +95,14 @@ def app(browser_context, request: pytest.FixtureRequest) -> Application:
 def logged_context(browser: Browser, configs: Config) -> BrowserContext:
     """Session scope context for reuse logged-in state."""
 
-    if STORAGE_STATE_PATH.exists():
-        if not expires_in_x_seconds(STORAGE_STATE_PATH):
-            context = browser.new_context(
-                **CONTEXT_ARGS,
-                storage_state=STORAGE_STATE_PATH,
-            )
-            yield context
-            context.close()
-            return
+    if STORAGE_STATE_PATH.exists() and not expires_in_x_seconds(STORAGE_STATE_PATH):
+        context = browser.new_context(
+            **CONTEXT_ARGS,
+            storage_state=STORAGE_STATE_PATH,
+        )
+        yield context
+        context.close()
+        return
 
     context = browser.new_context(**CONTEXT_ARGS)
     page = context.new_page()
@@ -130,21 +124,15 @@ def logged_context(browser: Browser, configs: Config) -> BrowserContext:
 
 
 @pytest.fixture(scope="session")
-def free_plan_context(
-    logged_context: BrowserContext, browser: Browser
-) -> BrowserContext:
+def free_plan_context(logged_context: BrowserContext, browser: Browser) -> BrowserContext:
     """Session scope context for reuse free plan logged-in state."""
-    context = browser.new_context(
-        **CONTEXT_ARGS, storage_state=FREE_PROJECT_STORAGE_STATE
-    )
+    context = browser.new_context(**CONTEXT_ARGS, storage_state=FREE_PROJECT_STORAGE_STATE)
     yield context
     context.close()
 
 
 @pytest.fixture(scope="function")
-def logged_app(
-    logged_context: BrowserContext, request: pytest.FixtureRequest
-) -> Application:
+def logged_app(logged_context: BrowserContext, request: pytest.FixtureRequest) -> Application:
     """Application instance with logged-in state for each test."""
     page = logged_context.new_page()
     start_tracing(page)
@@ -154,9 +142,7 @@ def logged_app(
 
 
 @pytest.fixture(scope="function")
-def free_plan_app(
-    free_plan_context: BrowserContext, request: pytest.FixtureRequest
-) -> Application:
+def free_plan_app(free_plan_context: BrowserContext, request: pytest.FixtureRequest) -> Application:
     """Application instance with free plan logged-in state for each test."""
     page = free_plan_context.new_page()
     start_tracing(page)

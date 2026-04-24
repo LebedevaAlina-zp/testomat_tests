@@ -204,7 +204,7 @@ Headed vs Headless
 ```python
 BROWSER_LAUNCH_ARGS = {
     "channel": "chrome",
-    "headless": True,  # set to True for CI/headless runs
+    "headless": True,
     "slow_mo": 0,
     "timeout": 120000,
 }

@@ -44,6 +44,7 @@ invalid_login_test_data = [
 ]
 
 
+@pytest.mark.regression
 @pytest.mark.flaky(retries=1, delay=2)
 @pytest.mark.web
 @pytest.mark.parametrize("invalid_email, invalid_password", invalid_login_test_data)

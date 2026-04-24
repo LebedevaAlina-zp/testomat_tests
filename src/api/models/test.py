@@ -27,9 +27,7 @@ class TestAttributes(BaseModel):
     run_statuses: list[str] | None = Field(
         None, alias="run-statuses", description="Last run statuses"
     )
-    attachments: list[str] | None = Field(
-        None, description="List of attachments or object"
-    )
+    attachments: list[str] | None = Field(None, description="List of attachments or object")
     jira_issues: list[str] | None = Field(
         None, alias="jira-issues", description="List/object of assigned jira issues"
     )
@@ -100,7 +98,7 @@ class TestsMeta(BaseModel):
     per_page: int | None = None
     num: int | None = None
     page: int | None = None
-    rId: Any | None = None
+    r_id: Any | None = Field(default=None, alias="rId")
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> TestsMeta:

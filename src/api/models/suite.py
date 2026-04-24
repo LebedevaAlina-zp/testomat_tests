@@ -92,7 +92,7 @@ class SuitesMeta(BaseModel):
     per_page: int | None = None
     num: int | None = None
     page: int | None = None
-    rId: Any | None = None
+    r_id: Any | None = Field(default=None, alias="rId")
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> SuitesMeta:

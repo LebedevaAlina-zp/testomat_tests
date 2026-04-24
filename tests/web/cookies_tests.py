@@ -14,6 +14,7 @@ def test_add_feature_flag_cookie(logged_app: Application, cookies: CookieHelper)
     assert cookies.get_value("feature_flag") == "dark_mode_enabled"
 
 
+@pytest.mark.regression
 @pytest.mark.web
 def test_clear_feature_flag_cookie(logged_app: Application, cookies: CookieHelper):
     """Verify that a feature flag cookie can be cleared."""
@@ -24,6 +25,7 @@ def test_clear_feature_flag_cookie(logged_app: Application, cookies: CookieHelpe
     assert not cookies.exists("feature_flag")
 
 
+@pytest.mark.regression
 @pytest.mark.web
 def test_add_multiple_feature_flags(logged_app: Application, cookies: CookieHelper):
     """Verify that multiple feature flag cookies can be added."""

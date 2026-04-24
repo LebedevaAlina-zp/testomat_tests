@@ -38,9 +38,9 @@ class Cookie:
     domain: str
     path: str = "/"
     expires: int | None = None
-    httpOnly: bool = False
+    http_only: bool = False
     secure: bool = False
-    sameSite: str = "Lax"  # One of: "Lax", "None", "Strict"
+    same_site: str = "Lax"  # One of: "Lax", "None", "Strict"
 
     def to_dict(self) -> dict[str, Any]:
         data = {
@@ -48,9 +48,9 @@ class Cookie:
             "value": self.value,
             "domain": self.domain,
             "path": self.path,
-            "httpOnly": self.httpOnly,
+            "httpOnly": self.http_only,
             "secure": self.secure,
-            "sameSite": self.sameSite,
+            "sameSite": self.same_site,
         }
         if self.expires is not None:
             data["expires"] = self.expires
@@ -85,9 +85,9 @@ class CookieHelper:
         path: str = "/",
         *,
         expires: int | None = None,
-        httpOnly: bool = False,
+        http_only: bool = False,
         secure: bool = False,
-        sameSite: str = "Lax",
+        same_site: str = "Lax",
     ) -> None:
         """Add or replace a cookie in storage_state.json.
 
@@ -97,7 +97,11 @@ class CookieHelper:
         cookies: list[dict[str, Any]] = list(state.get("cookies", []))
 
         # Remove existing cookie with same name (and domain if provided)
-        cookies = [c for c in cookies if not (c.get("name") == name and (domain is None or c.get("domain") == domain))]
+        cookies = [
+            c
+            for c in cookies
+            if not (c.get("name") == name and (domain is None or c.get("domain") == domain))
+        ]
 
         new_cookie = Cookie(
             name=name,
@@ -105,9 +109,9 @@ class CookieHelper:
             domain=domain,
             path=path,
             expires=expires,
-            httpOnly=httpOnly,
+            http_only=http_only,
             secure=secure,
-            sameSite=sameSite,
+            same_site=same_site,
         ).to_dict()
 
         cookies.append(new_cookie)
@@ -149,16 +153,20 @@ class CookieHelper:
                 data["domain"],
                 path=data.get("path", "/"),
                 expires=data.get("expires"),
-                httpOnly=data.get("httpOnly", False),
+                http_only=data.get("httpOnly", False),
                 secure=data.get("secure", False),
-                sameSite=data.get("sameSite", "Lax"),
+                same_site=data.get("sameSite", "Lax"),
             )
 
     def clear(self, name: str, domain: str | None = None) -> None:
         """Remove a cookie by name (and optional domain) from storage_state.json."""
         state = _load_state(self.storage_path)
         before = list(state.get("cookies", []))
-        after = [c for c in before if not (c.get("name") == name and (domain is None or c.get("domain") == domain))]
+        after = [
+            c
+            for c in before
+            if not (c.get("name") == name and (domain is None or c.get("domain") == domain))
+        ]
         state["cookies"] = after
         _save_state(self.storage_path, state)
 

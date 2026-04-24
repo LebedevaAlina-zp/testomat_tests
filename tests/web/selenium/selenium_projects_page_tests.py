@@ -5,6 +5,7 @@ from src.web.selenium.pages.projects_page import ProjectsPage
 from tests.fixtures import Config
 
 
+@pytest.mark.smoke
 @pytest.mark.selenium
 def test_default_enterprise_projects_page(logged_driver: WebDriver, configs: Config):
     projects_page = ProjectsPage(logged_driver, configs)
@@ -12,6 +13,7 @@ def test_default_enterprise_projects_page(logged_driver: WebDriver, configs: Con
     projects_page.is_loaded_default_enterprise()
 
 
+@pytest.mark.smoke
 @pytest.mark.selenium
 def test_free_plan_projects_page(free_logged_driver: WebDriver, configs: Config):
     free_plan_projects_page = ProjectsPage(free_logged_driver, configs)

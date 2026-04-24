@@ -1,3 +1,5 @@
+import random
+
 import pytest
 from faker import Faker
 
@@ -21,13 +23,15 @@ def test_get_suites_for_project(suite_controller, project_controller):
 @pytest.mark.smoke
 def test_get_suite_by_id_for_a_project(suite_controller, project_controller):
     """Get a suite by id and validate pydantic model."""
-    project = project_controller.random_project()
-    suite_controller.get_suites_for_project_id(project.id)
-    rand_suite = suite_controller.random_suite(project.id)
-    while rand_suite is None:
-        project = project_controller.random_project()
-        suite_controller.get_suites_for_project_id(project.id)
-        rand_suite = suite_controller.random_suite(project.id)
+    # Find a random project that has suites
+    if len(project_controller.projects) == 0:
+        project_controller.get_all()
+    random.shuffle(project_controller.projects)
+
+    for project in project_controller.projects:
+        if len(suite_controller.get_suites_for_project_id(project.id)) > 0:
+            rand_suite = suite_controller.random_suite(project.id)
+            break
 
     suite = suite_controller.get_by_id_for_project_id(project.id, rand_suite.id)
 
@@ -55,16 +59,14 @@ def test_add_suite(suite_controller, project_controller):
 
 
 @pytest.mark.api
-@pytest.mark.smoke
+@pytest.mark.regression
 def test_add_suite_with_description(suite_controller, project_controller):
     """Create a suite with valid attributes."""
     project = project_controller.random_project()
 
     suite_title = Faker().sentence()
     description = Faker().paragraph(nb_sentences=3)
-    suite = suite_controller.add_suite(
-        project.id, title=suite_title, description=description
-    )
+    suite = suite_controller.add_suite(project.id, title=suite_title, description=description)
 
     assert suite.attributes.title == suite_title
     assert suite.attributes.description == description
@@ -95,9 +97,12 @@ def test_delete_suite(suite_controller, project_controller):
 
 
 @pytest.mark.api
-@pytest.mark.smoke
+@pytest.mark.regression
 def test_update_suite_title(suite_controller, project_controller):
-    """Update a suite title, validate pydantic model, check other attributes haven't changed"""
+    """
+    Update a suite title, validate pydantic model,
+    check other attributes haven't changed.
+    """
     # Create a suite for a random project
     project = project_controller.random_project()
     suite = suite_controller.add_suite(
@@ -124,9 +129,12 @@ def test_update_suite_title(suite_controller, project_controller):
 
 
 @pytest.mark.api
-@pytest.mark.smoke
+@pytest.mark.regression
 def test_update_suite_description(suite_controller, project_controller):
-    """Update a suite description, validate pydantic model, check other attributes haven't changed"""
+    """
+    Update a suite description, validate pydantic model,
+    check other attributes haven't changed.
+    """
     # Create a suite for a random project
     project = project_controller.random_project()
     suite = suite_controller.add_suite(

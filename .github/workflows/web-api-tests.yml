@@ -1,0 +1,105 @@
+name: API CI
+
+# Triggers:
+# - pull_request: run linter and smoke only (regression job is skipped by its if-condition)
+# - schedule: run all three daily at 05:00 UTC (08:00 Europe/Kyiv)
+# - workflow_dispatch: run all three when started manually
+on:
+  pull_request:
+  schedule:
+    - cron: '0 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read  # minimal permissions
+
+jobs:
+  linter:
+    name: Lint (ruff)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BASE_URL: ${{ secrets.BASE_URL }}
+      BASE_APP_URL: ${{ secrets.BASE_APP_URL }}
+      EMAIL: ${{ secrets.EMAIL }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+      TESTOMAT_TOKEN: ${{ secrets.TESTOMAT_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup (Python + uv)
+        uses: ./.github/actions/py-uv-setup
+        with:
+          dev-deps: 'true'
+
+      - name: Ruff check
+        run: uv run ruff check .
+
+      - name: Upload HTML report (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-api-report-linter
+          path: test-result/report.html
+          if-no-files-found: ignore
+          retention-days: 3
+
+  smoke-api:
+    name: Smoke - API
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BASE_URL: ${{ secrets.BASE_URL }}
+      BASE_APP_URL: ${{ secrets.BASE_APP_URL }}
+      EMAIL: ${{ secrets.EMAIL }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+      TESTOMAT_TOKEN: ${{ secrets.TESTOMAT_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup (Python + uv)
+        uses: ./.github/actions/py-uv-setup
+
+      - name: Run smoke tests (API)
+        run: uv run pytest -m "api and smoke"
+
+      - name: Upload HTML report (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-api-report-smoke
+          path: test-result/report.html
+          if-no-files-found: ignore
+          retention-days: 3
+
+  regression-api:
+    name: Regression - API
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BASE_URL: ${{ secrets.BASE_URL }}
+      BASE_APP_URL: ${{ secrets.BASE_APP_URL }}
+      EMAIL: ${{ secrets.EMAIL }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+      TESTOMAT_TOKEN: ${{ secrets.TESTOMAT_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup (Python + uv)
+        uses: ./.github/actions/py-uv-setup
+
+      - name: Run regression tests (API)
+        run: uv run pytest -m "api and regression"
+
+      - name: Upload HTML report (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-api-report-regression
+          path: test-result/report.html
+          if-no-files-found: ignore
+          retention-days: 3
