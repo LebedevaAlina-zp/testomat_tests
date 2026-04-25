@@ -1,0 +1,313 @@
+name: Tests CI
+
+on:
+  push:
+    branches:
+      - MNFCT-8-CI
+  pull_request:
+  schedule:
+    - cron: '0 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  linter:
+    name: Lint (ruff)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BASE_URL: ${{ secrets.BASE_URL }}
+      BASE_APP_URL: ${{ secrets.BASE_APP_URL }}
+      EMAIL: ${{ secrets.EMAIL }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+      TESTOMAT_TOKEN: ${{ secrets.TESTOMAT_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup (Python + uv)
+        uses: ./.github/actions/py-uv-setup
+        with:
+          dev-deps: 'true'
+
+      - name: Ruff check
+        run: uv run ruff check .
+
+      - name: Upload Allure results (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-linter
+          path: test-result/allure-results
+          if-no-files-found: ignore
+          retention-days: 3
+
+  smoke-api:
+    name: Smoke - API
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BASE_URL: ${{ secrets.BASE_URL }}
+      BASE_APP_URL: ${{ secrets.BASE_APP_URL }}
+      EMAIL: ${{ secrets.EMAIL }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+      TESTOMAT_TOKEN: ${{ secrets.TESTOMAT_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup (Python + uv)
+        uses: ./.github/actions/py-uv-setup
+
+      - name: Run smoke tests (API)
+        run: uv run pytest -m "api and smoke" --alluredir test-result/allure-results
+
+      - name: Upload Allure results (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-api-smoke
+          path: test-result/allure-results
+          if-no-files-found: ignore
+          retention-days: 3
+
+  regression-api:
+    name: Regression - API
+    needs: [ smoke-api ]
+    if: needs.smoke-api.result == 'success' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BASE_URL: ${{ secrets.BASE_URL }}
+      BASE_APP_URL: ${{ secrets.BASE_APP_URL }}
+      EMAIL: ${{ secrets.EMAIL }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+      TESTOMAT_TOKEN: ${{ secrets.TESTOMAT_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup (Python + uv)
+        uses: ./.github/actions/py-uv-setup
+
+      - name: Run regression tests (API)
+        run: uv run pytest -m "api and regression" --alluredir test-result/allure-results
+
+      - name: Upload Allure results (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-api-regression
+          path: test-result/allure-results
+          if-no-files-found: ignore
+          retention-days: 3
+
+  smoke-web-playwright:
+    name: Smoke - Web (Playwright Chromium)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BASE_URL: ${{ secrets.BASE_URL }}
+      BASE_APP_URL: ${{ secrets.BASE_APP_URL }}
+      EMAIL: ${{ secrets.EMAIL }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+      TESTOMAT_TOKEN: ${{ secrets.TESTOMAT_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup (Python + uv + Playwright)
+        uses: ./.github/actions/py-uv-setup
+        with:
+          install-playwright: 'true'
+
+      - name: Run smoke tests (Playwright)
+        run: uv run pytest -n 2 -m "web and smoke and not selenium" --alluredir test-result/allure-results
+
+      - name: Upload Allure results (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-playwright-smoke
+          path: test-result/allure-results
+          if-no-files-found: ignore
+          retention-days: 3
+
+      - name: Upload Playwright traces (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: test-result/traces
+          if-no-files-found: ignore
+          retention-days: 3
+
+  regression-web-playwright:
+    name: Regression - Web (Playwright Chromium)
+    needs: [ smoke-web-playwright ]
+    if: needs.smoke-web-playwright.result == 'success' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BASE_URL: ${{ secrets.BASE_URL }}
+      BASE_APP_URL: ${{ secrets.BASE_APP_URL }}
+      EMAIL: ${{ secrets.EMAIL }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+      TESTOMAT_TOKEN: ${{ secrets.TESTOMAT_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup (Python + uv + Playwright)
+        uses: ./.github/actions/py-uv-setup
+        with:
+          install-playwright: 'true'
+
+      - name: Run regression tests (Playwright)
+        run: uv run pytest -n 2 -m "web and regression and not selenium" --alluredir test-result/allure-results
+
+      - name: Upload Allure results (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-playwright-regression
+          path: test-result/allure-results
+          if-no-files-found: ignore
+          retention-days: 3
+
+      - name: Upload Playwright traces (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: test-result/traces
+          if-no-files-found: ignore
+          retention-days: 3
+
+  smoke-web-selenium:
+    name: Smoke - Web (Selenium)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BASE_URL: ${{ secrets.BASE_URL }}
+      BASE_APP_URL: ${{ secrets.BASE_APP_URL }}
+      EMAIL: ${{ secrets.EMAIL }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+      TESTOMAT_TOKEN: ${{ secrets.TESTOMAT_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup (Python + uv + Chrome)
+        uses: ./.github/actions/py-uv-setup
+        with:
+          install-chrome: 'true'
+
+      - name: Run smoke tests (Selenium)
+        run: uv run pytest -n 2 -m "smoke and selenium" --alluredir test-result/allure-results
+
+      - name: Upload Allure results (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-selenium-smoke
+          path: test-result/allure-results
+          if-no-files-found: ignore
+          retention-days: 3
+
+  regression-web-selenium:
+    name: Regression - Web (Selenium)
+    needs: [ smoke-web-selenium ]
+    if: needs.smoke-web-selenium.result == 'success' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BASE_URL: ${{ secrets.BASE_URL }}
+      BASE_APP_URL: ${{ secrets.BASE_APP_URL }}
+      EMAIL: ${{ secrets.EMAIL }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+      TESTOMAT_TOKEN: ${{ secrets.TESTOMAT_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup (Python + uv + Chrome)
+        uses: ./.github/actions/py-uv-setup
+        with:
+          install-chrome: 'true'
+
+      - name: Run regression tests (Selenium)
+        run: uv run pytest -n 2 -m "regression and selenium" --alluredir test-result/allure-results
+
+      - name: Upload Allure results (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-selenium-regression
+          path: test-result/allure-results
+          if-no-files-found: ignore
+          retention-days: 3
+
+  publish-allure:
+    name: Publish Allure Report (GitHub Pages)
+    needs:
+      - linter
+      - smoke-api
+      - smoke-web-playwright
+      - smoke-web-selenium
+      - regression-api
+      - regression-web-playwright
+      - regression-web-selenium
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (empty)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Download all Allure results artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: allure-*
+          merge-multiple: true
+          path: test-result/allure-results
+
+      - name: Setup Node.js (for Allure 3 CLI)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Generate Allure report (v3)
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Allure CLI version: $(npx --yes allure@3 --version)"
+          mkdir -p site
+          echo "Counting result files..."
+          count=$(find test-result/allure-results -type f 2>/dev/null | wc -l || true)
+          echo "Generating Allure report from ${count} files"
+          # Try generating from the explicit merged directory first; if it fails, fall back to default pattern
+          if ! npx --yes allure@3 generate test-result/allure-results -o site; then
+            echo "Fallback: using default pattern (./**/allure-results)"
+            npx --yes allure@3 generate -o site
+          fi
+          # Prevent GitHub Pages from processing the output with Jekyll
+          touch site/.nojekyll
+          {
+            echo "### Allure Report (GitHub Pages)";
+            echo;
+            echo "[Open published Allure report](https://lebedevaalina-zp.github.io/testomat_tests/)";
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
