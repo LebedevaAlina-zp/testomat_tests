@@ -1,5 +1,6 @@
 from typing import Self
 
+import allure
 from playwright.sync_api import Page, expect
 
 
@@ -19,10 +20,12 @@ class LoginPage:
         self.remember_me_checkbox = self._root_container.locator("#user_remember_me")
         self.signin_btn = page.get_by_role("button", name="Sign In")
 
+    @allure.step
     def open(self) -> Self:
         self.page.goto("/users/sign_in")
         return self
 
+    @allure.step
     def is_loaded(self) -> Self:
         expect(self.signup_href).to_be_visible(timeout=10000)
         expect(self.auth_with_google).to_be_visible()
@@ -35,6 +38,7 @@ class LoginPage:
         expect(self.signin_btn).to_be_visible()
         return self
 
+    @allure.step
     def login(self, email: str, password: str, remember_me: bool = False) -> Self:
         self.email_input.fill(email)
         self.password_input.fill(password)
@@ -45,6 +49,7 @@ class LoginPage:
         self.signin_btn.click()
         return self
 
+    @allure.step
     def is_invalid_login_message_visible(self) -> Self:
         expect(self._root_container.get_by_text("Invalid Email or password.")).to_be_visible()
         return self

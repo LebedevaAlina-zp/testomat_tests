@@ -1,5 +1,6 @@
 from typing import Self
 
+import allure
 from playwright.sync_api import Page, expect
 
 from src.web.components.project_page_readme_block import (
@@ -23,10 +24,12 @@ class EmptyProjectTestsTab:
         expect(self.add_suite_btn).to_be_visible()
         return self
 
+    @allure.step
     def verify_project_title_is(self, expected_title) -> Self:
         expect(self.project_title).to_have_text(expected_title)
         return self
 
+    @allure.step
     def create_quickstart_suite(self, suite_title) -> Self:
         self.input_new_suite_title.fill(suite_title)
         self.add_suite_btn.click()

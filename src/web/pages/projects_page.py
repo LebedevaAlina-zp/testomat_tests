@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Self
 
+import allure
 from playwright.sync_api import Page, expect
 
 from src.web.components import HeaderNav, ProjectCard
@@ -28,9 +29,7 @@ class ProjectsPage:
 
         # Projects header elements
         self.company_dropdown = self.page_header.locator("#company_id")
-        self.current_subscription = self.page_header.locator(
-            ".tooltip-project-plan span"
-        )
+        self.current_subscription = self.page_header.locator(".tooltip-project-plan span")
         self.create_company_btn = self.page_header.get_by_role(
             "link", name="Create Company to Upgrade"
         )
@@ -43,10 +42,12 @@ class ProjectsPage:
         self.grid = self._root.locator("#grid")
         self.project_cards = self.grid.locator("li")
 
+    @allure.step
     def open(self) -> Self:
         self.page.goto("/")
         return self
 
+    @allure.step
     def is_loaded(self) -> Self:
         expect(self.header.dashboard).to_be_visible()
         expect(self.header.create_project_icon).to_be_visible()
@@ -54,13 +55,16 @@ class ProjectsPage:
         expect(self.grid).to_be_visible()
         return self
 
+    @allure.step
     def search_project(self, name: str) -> Self:
         self.search_input.fill(name, force=True)
         return self
 
+    @allure.step
     def get_projects(self) -> list[ProjectCard]:
         return [ProjectCard(card) for card in self.project_cards.all()]
 
+    @allure.step
     def open_project_by_name(self, name: str) -> Self:
         card = self.project_cards.filter(has_text=name).first
         ProjectCard(card).open()
@@ -70,18 +74,22 @@ class ProjectsPage:
     def company_options(self) -> CompanyOptions:
         return CompanyOptions(qa_club_lviv="789", free_projects="")
 
+    @allure.step
     def expect_selected_company(self, name: str) -> Self:
         expect(self.company_dropdown.locator("option:checked")).to_have_text(name)
         return self
 
+    @allure.step
     def expect_current_subscription(self, name: str) -> Self:
         expect(self.current_subscription).to_have_text(name)
 
+    @allure.step
     def select_company(self, company: CompanyOptions):
         self.company_dropdown.click()
         self.company_dropdown.select_option(company)
         return self
 
+    @allure.step
     def is_sign_in_successful_message_visible(self) -> Self:
         expect(self.sign_in_flash_message).to_be_visible()
         return self
