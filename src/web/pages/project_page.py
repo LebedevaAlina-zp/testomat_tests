@@ -1,6 +1,7 @@
 import re
 from typing import Self
 
+import allure
 from playwright.sync_api import Page, expect
 
 from src.web.components import (
@@ -24,6 +25,7 @@ class ProjectPage:
 
         self.current_tab_name = self.page.locator(".breadcrumbs-page-second-level")
 
+    @allure.step
     def open_by_project_name(self, project_name: str) -> Self:
         """Acceptable project_name:
         project title (e.g. "Grocery & Shoes")
@@ -32,26 +34,31 @@ class ProjectPage:
         self.page.goto(f"/projects/{slug}")
         return self
 
+    @allure.step
     def open_by_id(self, project_id: str) -> Self:
         self.page.goto(f"/projects/{project_id}")
         return self
 
+    @allure.step
     def is_loaded(self) -> Self:
         self.side_bar.is_loaded()
         expect(self.current_tab_name).to_have_text("Tests")
         self.tests_tab.is_loaded()
         return self
 
+    @allure.step
     def is_loaded_empty(self):
         self.side_bar.is_loaded()
         self.empty_project_tests_tab.is_loaded()
         self.empty_project_tests_tab.readme_block.is_loaded()
         return self
 
+    @allure.step
     def verify_project_title_is(self, expected_title) -> Self:
         expect(self.page.locator(f"[title={expected_title}]")).to_be_visible()
         return self
 
+    @allure.step
     def create_suite(self, suite_title: str) -> Self:
         """Create a test suite via '+ Suite' in '+ Test' dropdown menu"""
         self.page.get_by_role("button", name="Test").locator(
@@ -63,8 +70,7 @@ class ProjectPage:
         self.suite_creation_form.save_suite()
         return self
 
+    @allure.step
     def suite_with_title_is_visible(self, suite_title: str) -> Self:
-        expect(
-            self.page.locator(".suites-list-content").get_by_text(suite_title)
-        ).to_be_visible()
+        expect(self.page.locator(".suites-list-content").get_by_text(suite_title)).to_be_visible()
         return self

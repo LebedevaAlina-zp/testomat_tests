@@ -5,6 +5,10 @@ name: Web Selenium CI
 # - schedule: run all three daily at 05:00 UTC (08:00 Europe/Kyiv)
 # - workflow_dispatch: run all three when started manually
 on:
+  push:
+    branches:
+      - MNFCT-8-CI
+
   pull_request:
   schedule:
     - cron: '0 5 * * *'

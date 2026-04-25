@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import Self
 
+import allure
 from playwright.sync_api import Page, expect
 
 from src.web.components import HeaderNav
@@ -25,10 +26,12 @@ class NewProjectPage:
 
         self.create_project_button = self._root.locator("#project-create-btn input")
 
+    @allure.step
     def open(self) -> Self:
         self.page.goto("/projects/new")
         return self
 
+    @allure.step
     def is_loaded(self) -> Self:
         self.header.is_loaded()
         expect(self.create_project_button).to_be_visible()
@@ -40,6 +43,7 @@ class NewProjectPage:
         expect(self.create_project_button).to_be_visible()
         return self
 
+    @allure.step
     def create_new_project(
         self,
         project_title: str,

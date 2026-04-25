@@ -1,6 +1,7 @@
 import re
 from typing import Self
 
+import allure
 from playwright.sync_api import Page, expect
 
 
@@ -40,67 +41,83 @@ class SideBarNav:
             "Profile": self.profile_link,
         }
 
+    @allure.step
     def is_loaded(self) -> Self:
         expect(self._menu_container).to_be_visible()
         expect(self.toggle_button).to_be_visible()
         return self
 
+    @allure.step
     def expect_tab_active(self, name: str):
         expect(self._links[name]).to_have_attribute("class", re.compile(r"\bactive\b"))
         return self
 
+    @allure.step
     def open_side_bar(self):
         self.toggle_button.click()
         return self
 
+    @allure.step
     def click_tests(self):
         self.tests_link.click()
         return self
 
+    @allure.step
     def click_requirements(self):
         self.requirements_link.click()
         return self
 
+    @allure.step
     def click_runs(self):
         self.runs_link.click()
         return self
 
+    @allure.step
     def click_plans(self):
         self.plans_link.click()
         return self
 
+    @allure.step
     def click_steps(self):
         self.steps_link.click()
         return self
 
+    @allure.step
     def click_pulse(self):
         self.pulse_link.click()
         return self
 
+    @allure.step
     def click_imports(self):
         self.imports_link.click()
         return self
 
+    @allure.step
     def click_analytics(self):
         self.analytics_link.click()
         return self
 
+    @allure.step
     def click_branches(self):
         self.branches_link.click()
         return self
 
+    @allure.step
     def click_settings(self):
         self.settings_link.click()
         return self
 
+    @allure.step
     def click_help(self):
         self.help_link.click()
         return self
 
+    @allure.step
     def click_projects(self):
         self.projects_link.click()
         return self
 
+    @allure.step
     def click_profile(self):
         self.profile_link.click()
         return self

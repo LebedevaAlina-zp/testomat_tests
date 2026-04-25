@@ -140,23 +140,23 @@ jobs:
           generate_or_fallback downloads/playwright/regression "site/${DATE_TAG}/playwright/regression" "Playwright Regression Report (${DATE_TAG})"
           generate_or_fallback downloads/selenium/smoke      "site/${DATE_TAG}/selenium/smoke"      "Selenium Smoke Report (${DATE_TAG})"
           generate_or_fallback downloads/selenium/regression "site/${DATE_TAG}/selenium/regression" "Selenium Regression Report (${DATE_TAG})"
-
-          # latest redirects
-          make_redirect() {
-            dest_dir="$1"; target_rel="$2"; title="$3";
-            mkdir -p "$dest_dir"
-            printf '%s\n' "<!doctype html>" \
-              "<html><head><meta charset=\"utf-8\"><meta http-equiv=\"refresh\" content=\"0; url=${target_rel}\"><title>${title}</title></head>" \
-              "<body><a href=\"${target_rel}\">Go to latest</a></body></html>" \
-              >"$dest_dir/index.html"
-          }
-
-          make_redirect site/api/latest/smoke        "../../${DATE_TAG}/api/smoke/"                 "API Smoke (latest)"
-          make_redirect site/api/latest/regression   "../../${DATE_TAG}/api/regression/"            "API Regression (latest)"
-          make_redirect site/playwright/latest/smoke      "../../${DATE_TAG}/playwright/smoke/"     "Playwright Smoke (latest)"
-          make_redirect site/playwright/latest/regression "../../${DATE_TAG}/playwright/regression/" "Playwright Regression (latest)"
-          make_redirect site/selenium/latest/smoke      "../../${DATE_TAG}/selenium/smoke/"         "Selenium Smoke (latest)"
-          make_redirect site/selenium/latest/regression "../../${DATE_TAG}/selenium/regression/"     "Selenium Regression (latest)"
+          
+          #          # latest redirects
+          #          make_redirect() {
+          #            dest_dir="$1"; target_rel="$2"; title="$3";
+          #            mkdir -p "$dest_dir"
+          #            printf '%s\n' "<!doctype html>" \
+          #              "<html><head><meta charset=\"utf-8\"><meta http-equiv=\"refresh\" content=\"0; url=${target_rel}\"><title>${title}</title></head>" \
+          #              "<body><a href=\"${target_rel}\">Go to latest</a></body></html>" \
+          #              >"$dest_dir/index.html"
+          #          }
+          #
+          #          make_redirect site/api/latest/smoke        "../../${DATE_TAG}/api/smoke/"                 "API Smoke (latest)"
+          #          make_redirect site/api/latest/regression   "../../${DATE_TAG}/api/regression/"            "API Regression (latest)"
+          #          make_redirect site/playwright/latest/smoke      "../../${DATE_TAG}/playwright/smoke/"     "Playwright Smoke (latest)"
+          #          make_redirect site/playwright/latest/regression "../../${DATE_TAG}/playwright/regression/" "Playwright Regression (latest)"
+          #          make_redirect site/selenium/latest/smoke      "../../${DATE_TAG}/selenium/smoke/"         "Selenium Smoke (latest)"
+          #          make_redirect site/selenium/latest/regression "../../${DATE_TAG}/selenium/regression/"     "Selenium Regression (latest)"
 
           # root landing page
           printf '%s\n' \
@@ -165,16 +165,16 @@ jobs:
             "<body>" \
             "  <h1>Test Reports</h1>" \
             "  <h2>Latest</h2>" \
-            "  <ul>" \
-            "    <li><a href=\"api/latest/smoke/\">API / Smoke</a></li>" \
-            "    <li><a href=\"api/latest/regression/\">API / Regression</a></li>" \
-            "    <li><a href=\"playwright/latest/smoke/\">Playwright / Smoke</a></li>" \
-            "    <li><a href=\"playwright/latest/regression/\">Playwright / Regression</a></li>" \
-            "    <li><a href=\"selenium/latest/smoke/\">Selenium / Smoke</a></li>" \
-            "    <li><a href=\"selenium/latest/regression/\">Selenium / Regression</a></li>" \
-            "  </ul>" \
-            "  <h2>Current Run</h2>" \
-            "  <p>Date tag: ${DATE_TAG}</p>" \
+          #            "  <ul>" \
+          #            "    <li><a href=\"api/latest/smoke/\">API / Smoke</a></li>" \
+          #            "    <li><a href=\"api/latest/regression/\">API / Regression</a></li>" \
+          #            "    <li><a href=\"playwright/latest/smoke/\">Playwright / Smoke</a></li>" \
+          #            "    <li><a href=\"playwright/latest/regression/\">Playwright / Regression</a></li>" \
+          #            "    <li><a href=\"selenium/latest/smoke/\">Selenium / Smoke</a></li>" \
+          #            "    <li><a href=\"selenium/latest/regression/\">Selenium / Regression</a></li>" \
+          #            "  </ul>" \
+          #            "  <h2>Current Run</h2>" \
+          #            "  <p>Date tag: ${DATE_TAG}</p>" \
             "  <ul>" \
             "    <li><a href=\"${DATE_TAG}/api/smoke/\">${DATE_TAG} / API / Smoke</a></li>" \
             "    <li><a href=\"${DATE_TAG}/api/regression/\">${DATE_TAG} / API / Regression</a></li>" \
