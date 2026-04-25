@@ -1,6 +1,7 @@
 from typing import Self
 
 import allure
+from allure_commons.types import ParameterMode
 from playwright.sync_api import Page, expect
 
 
@@ -38,15 +39,20 @@ class LoginPage:
         expect(self.signin_btn).to_be_visible()
         return self
 
-    @allure.step
     def login(self, email: str, password: str, remember_me: bool = False) -> Self:
-        self.email_input.fill(email)
-        self.password_input.fill(password)
+        # Do not use @allure.step on this method to avoid auto-capturing sensitive parameters.
+        with allure.step("Login with user credentials"):
+            # Optionally expose masked/hidden parameters for traceability without leaking values
+            allure.dynamic.parameter("email", "hidden", mode=ParameterMode.HIDDEN)
+            allure.dynamic.parameter("password", "hidden", mode=ParameterMode.HIDDEN)
 
-        if remember_me:
-            self.remember_me_checkbox.check()
+            self.email_input.fill(email)
+            self.password_input.fill(password)
 
-        self.signin_btn.click()
+            if remember_me:
+                self.remember_me_checkbox.check()
+
+            self.signin_btn.click()
         return self
 
     @allure.step
