@@ -9,16 +9,10 @@ fake = Faker()
 invalid_login_test_data = [
     # Invalid email formats
     pytest.param("plainaddress", fake.password(length=8), id="missing_at_symbol"),
-    pytest.param(
-        "@missingusername.com", fake.password(length=8), id="missing_username"
-    ),
+    pytest.param("@missingusername.com", fake.password(length=8), id="missing_username"),
     pytest.param("username@.com", fake.password(length=8), id="missing_domain_name"),
-    pytest.param(
-        "username@domain", fake.password(length=8), id="missing_top_level_domain"
-    ),
-    pytest.param(
-        "username@domain.c", fake.password(length=8), id="short_top_level_domain"
-    ),
+    pytest.param("username@domain", fake.password(length=8), id="missing_top_level_domain"),
+    pytest.param("username@domain.c", fake.password(length=8), id="short_top_level_domain"),
     # Boundary value analysis for password length
     pytest.param(fake.email(), "", id="empty_password"),
     pytest.param(fake.email(), "short", id="short_password"),
@@ -34,9 +28,7 @@ invalid_login_test_data = [
         fake.password(length=8),
         id="xss_injection_email",
     ),
-    pytest.param(
-        fake.email(), "<script>alert('XSS')</script>", id="xss_injection_password"
-    ),
+    pytest.param(fake.email(), "<script>alert('XSS')</script>", id="xss_injection_password"),
     # SQL injection cases
     pytest.param("' OR '1'='1' --", fake.password(length=8), id="sql_injection_email"),
     pytest.param(fake.email(), "' OR '1'='1' --", id="sql_injection_password"),
@@ -45,7 +37,7 @@ invalid_login_test_data = [
 
 
 @pytest.mark.regression
-@pytest.mark.flaky(retries=1, delay=2)
+@pytest.mark.flaky(reruns=1, reruns_delay=2)
 @pytest.mark.web
 @pytest.mark.parametrize("invalid_email, invalid_password", invalid_login_test_data)
 def test_login_invalid(app: Application, invalid_email, invalid_password):
