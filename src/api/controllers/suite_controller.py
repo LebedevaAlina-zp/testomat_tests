@@ -1,5 +1,7 @@
 import random
 
+import allure
+
 from src.api.controllers.base_controller import BaseController
 from src.api.models import Suite, SuitesResponse
 
@@ -10,6 +12,7 @@ class SuiteController(BaseController):
         # Stores the list of suites after calling get_suites_for_project_id
         self.suites: list[Suite] = []
 
+    @allure.step("Get suites list for a project")
     def get_suites_for_project_id(self, project_id: str) -> list[Suite]:
         """Returns a suites list via GET /api/{project_id}/suites"""
         response = self._get(f"/api/{project_id}/suites")
@@ -21,17 +24,35 @@ class SuiteController(BaseController):
                 self.suites.extend(SuitesResponse.model_validate(response).data)
         return self.suites
 
+    @allure.step("Get a suite by id")
     def get_by_id_for_project_id(self, project_id: str, suite_id: str) -> Suite:
         """Returns a suite via GET /api/{project_id}/suites/{suite_id}"""
         response = self._get(f"/api/{project_id}/suites/{suite_id}")
         return Suite.model_validate(response.get("data"))
 
-    def random_suite(self, project_id) -> Suite:
-        """Returns a random suite or None if a suite does not exist for this project."""
+    @allure.step("Pick a random suite from the suites list")
+    def random_suite(self, project_id, folder_type: bool | None = None) -> Suite:
+        """Returns a random suite or None if a suite does not exist for this project.
+        Optionally returns folder type or not folder type,
+        or None in cases there are no suites of the required type"""
         if len(self.suites) == 0:
             self.get_suites_for_project_id(project_id)
-        return random.choice(self.suites)
 
+        # suite = random.choice(self.suites)
+        random.shuffle(self.suites)
+
+        if folder_type is None:
+            return random.choice(self.suites)
+        elif folder_type:
+            for suite in self.suites:
+                if suite.attributes.file_type == "folder":
+                    return suite
+        else:
+            for suite in self.suites:
+                if suite.attributes.file_type != "folder":
+                    return suite
+
+    @allure.step("Create new suite")
     def add_suite(
         self,
         project_id: str,
@@ -64,6 +85,7 @@ class SuiteController(BaseController):
         response = self._post(f"/api/{project_id}/suites", data=payload)
         return Suite.model_validate(response.get("data"))
 
+    @allure.step("Update a suite")
     def update_suite(
         self,
         project_id: str,
@@ -97,6 +119,7 @@ class SuiteController(BaseController):
         response = self._put(f"/api/{project_id}/suites/{suite_id}", data=payload)
         return Suite.model_validate(response.get("data"))
 
+    @allure.step("Delete a suite")
     def delete_by_id_for_project_id(self, project_id: str, suite_id: str) -> None:
         """Delete a suite via DELETE /api/{project_id}/suites/{suite_id}"""
         self._delete(f"/api/{project_id}/suites/{suite_id}")

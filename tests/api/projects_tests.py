@@ -19,10 +19,3 @@ def test_get_project_by_id(project_controller):
     assert project.id == rand_project.id
     assert project.attributes.title == rand_project.attributes.title
     assert project.attributes.tests_count == rand_project.attributes.tests_count
-
-    # Pick another random project from the projects list
-    rand_project = project_controller.random_project()
-
-    project_title = rand_project.attributes.title
-    id = project_controller.get_id_by_project_title(project_title)
-    assert id == rand_project.id

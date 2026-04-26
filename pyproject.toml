@@ -12,6 +12,7 @@ dependencies = [
     "pytest>=9.0.2",
     "pytest-html>=4.2.0",
     "pytest-retry>=1.7.0",
+    "pytest-xdist>=3.8.0",
     "python-dotenv>=1.2.1",
     "requests>=2.32.0",
     "selenium>=4.41.0",

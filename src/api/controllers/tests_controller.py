@@ -1,3 +1,5 @@
+import allure
+
 from src.api.controllers.base_controller import BaseController
 from src.api.models import Test, TestsResponse
 
@@ -8,6 +10,7 @@ class TestController(BaseController):
         # Stores the list of tests after calling get_tests_for_project_id
         self.tests: list[Test] = []
 
+    @allure.step("Get tests list for a project")
     def get_tests_for_project_id(self, project_id: str) -> list[Test]:
         """Returns a tests list via GET /api/{project_id}/tests"""
         response = self._get(f"/api/{project_id}/tests")
@@ -19,17 +22,20 @@ class TestController(BaseController):
                 self.tests.extend(TestsResponse.model_validate(response).data)
         return self.tests
 
+    @allure.step("Get tests list for a suite")
     def get_tests_for_suite(self, project_id: str, suite_id: str) -> list[Test]:
         """Returns a tests list for a specified suite via GET /api/{project_id}/tests?suite_id="""
         response = self._get(f"/api/{project_id}/tests?suite_id={suite_id}")
         self.tests = TestsResponse.model_validate(response).data
         return self.tests
 
+    @allure.step("Get a test by id")
     def get_by_id_for_project_id(self, project_id: str, test_id: str) -> Test:
         """Returns tests via GET /api/{project_id}/tests/{test_id}."""
         response = self._get(f"/api/{project_id}/tests/{test_id}")
         return Test.model_validate(response.get("data"))
 
+    @allure.step("Create new test")
     def add_test(
         self,
         project_id: str,
@@ -50,16 +56,28 @@ class TestController(BaseController):
         Returns:
             Parsed `Test` model of the created test (from response.data).
         """
-        attrs: dict[str, object] = {"suite_id": suite_id, "title": title}
+        # Build attributes section (do not include suite reference here; it's a relationship)
+        attrs: dict[str, object] = {"title": title}
         if description:
             attrs["description"] = description
         if attributes:
+            # Avoid passing suite reference inside attributes to match API schema
+            attributes = dict(attributes)
+            attributes.pop("suite_id", None)
+            attributes.pop("suite-id", None)
             attrs.update(attributes)
 
-        payload = {"data": {"type": "test", "attributes": attrs}}
+        payload = {
+            "data": {
+                "type": "tests",
+                "attributes": attrs,
+                "relationships": {"suite": {"data": {"type": "suites", "id": suite_id}}},
+            }
+        }
         response = self._post(f"/api/{project_id}/tests", data=payload)
         return Test.model_validate(response.get("data"))
 
+    @allure.step("Update a test")
     def update_test(
         self,
         project_id: str,
@@ -98,6 +116,7 @@ class TestController(BaseController):
         response = self._put(f"/api/{project_id}/tests/{test_id}", data=payload)
         return Test.model_validate(response.get("data"))
 
+    @allure.step("Delete a test")
     def delete_by_id_for_project_id(self, project_id: str, test_id: str) -> None:
         """Delete a test via DELETE /api/{project_id}/tests/{test_id}"""
         self._delete(f"/api/{project_id}/tests/{test_id}")

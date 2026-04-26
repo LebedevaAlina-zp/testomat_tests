@@ -1,6 +1,7 @@
 import re
 from typing import Self
 
+import allure
 from playwright.sync_api import Page, expect
 
 
@@ -45,62 +46,77 @@ class SideBarNav:
         expect(self.toggle_button).to_be_visible()
         return self
 
+    @allure.step("Expect specified tab is active")
     def expect_tab_active(self, name: str):
         expect(self._links[name]).to_have_attribute("class", re.compile(r"\bactive\b"))
         return self
 
+    @allure.step("Open the side navigation bar")
     def open_side_bar(self):
         self.toggle_button.click()
         return self
 
+    @allure.step("Click 'Tests' in side navigation bar")
     def click_tests(self):
         self.tests_link.click()
         return self
 
+    @allure.step("Click 'Requirements' in side navigation bar")
     def click_requirements(self):
         self.requirements_link.click()
         return self
 
+    @allure.step("Click 'Runs' in side navigation bar")
     def click_runs(self):
         self.runs_link.click()
         return self
 
+    @allure.step("Click 'Plans' in side navigation bar")
     def click_plans(self):
         self.plans_link.click()
         return self
 
+    @allure.step("Click 'Steps' in side navigation bar")
     def click_steps(self):
         self.steps_link.click()
         return self
 
+    @allure.step("Click 'Pulse' in side navigation bar")
     def click_pulse(self):
         self.pulse_link.click()
         return self
 
+    @allure.step("Click 'Imports' in side navigation bar")
     def click_imports(self):
         self.imports_link.click()
         return self
 
+    @allure.step("Click 'Analytics' in side navigation bar")
     def click_analytics(self):
         self.analytics_link.click()
         return self
 
+    @allure.step("Click 'Branches' in side navigation bar")
     def click_branches(self):
         self.branches_link.click()
         return self
 
+    @allure.step("Click 'Settings' in side navigation bar")
     def click_settings(self):
         self.settings_link.click()
         return self
 
+    @allure.step("Click 'Help' in side navigation bar")
     def click_help(self):
         self.help_link.click()
         return self
 
+    @allure.step("Click 'Projects' in side navigation bar")
     def click_projects(self):
         self.projects_link.click()
         return self
 
+    @allure.step("Click 'Profile' in side navigation bar")
     def click_profile(self):
         self.profile_link.click()
         return self
