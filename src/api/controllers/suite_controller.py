@@ -26,11 +26,26 @@ class SuiteController(BaseController):
         response = self._get(f"/api/{project_id}/suites/{suite_id}")
         return Suite.model_validate(response.get("data"))
 
-    def random_suite(self, project_id) -> Suite:
-        """Returns a random suite or None if a suite does not exist for this project."""
+    def random_suite(self, project_id, folder_type: bool | None = None) -> Suite:
+        """Returns a random suite or None if a suite does not exist for this project.
+        Optionally returns folder type or not folder type,
+        or None in cases there are no suites of the required type"""
         if len(self.suites) == 0:
             self.get_suites_for_project_id(project_id)
-        return random.choice(self.suites)
+
+        # suite = random.choice(self.suites)
+        random.shuffle(self.suites)
+
+        if folder_type is None:
+            return random.choice(self.suites)
+        elif folder_type:
+            for suite in self.suites:
+                if suite.attributes.file_type == "folder":
+                    return suite
+        else:
+            for suite in self.suites:
+                if suite.attributes.file_type != "folder":
+                    return suite
 
     def add_suite(
         self,

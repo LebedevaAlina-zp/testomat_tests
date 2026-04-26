@@ -13,7 +13,8 @@ def test_get_tests_for_project(tests_controller, project_controller):
 
     tests_list = tests_controller.get_tests_for_project_id(project.id)
 
-    assert len(tests_list) == project.attributes.tests_count
+    # Note: API may return None for suites without tests, normalize to 0 for comparison
+    assert len(tests_list) == (project.attributes.tests_count or 0)
 
 
 @pytest.mark.api
@@ -33,7 +34,8 @@ def test_get_tests_for_suite(tests_controller, project_controller, suite_control
 
     tests_list = tests_controller.get_tests_for_suite(project.id, suite.id)
 
-    assert len(tests_list) == suite.attributes.test_count
+    # Note: API may return None for suites without tests, normalize to 0 for comparison
+    assert len(tests_list) == (suite.attributes.test_count or 0)
 
 
 @pytest.mark.api
@@ -65,7 +67,7 @@ def test_add_test(tests_controller, suite_controller, project_controller):
         if len(suite_controller.get_suites_for_project_id(project.id)) > 0:
             break
 
-    suite = suite_controller.random_suite(project.id)
+    suite = suite_controller.random_suite(project.id, folder_type=False)
 
     test_title = Faker().sentence()
     test_description = Faker().paragraph(nb_sentences=3)
@@ -88,7 +90,7 @@ def test_delete_test(tests_controller, suite_controller, project_controller):
     # Create a test
     project = project_controller.random_project(with_tests=True)
     suite_controller.get_suites_for_project_id(project.id)
-    suite = suite_controller.random_suite(project.id)
+    suite = suite_controller.random_suite(project.id, folder_type=False)
     test = tests_controller.add_test(project.id, suite.id, title=Faker().sentence())
 
     # Delete the suite
@@ -107,7 +109,7 @@ def test_update_test_title(tests_controller, suite_controller, project_controlle
     # Create a test
     project = project_controller.random_project(with_tests=True)
     suite_controller.get_suites_for_project_id(project.id)
-    suite = suite_controller.random_suite(project.id)
+    suite = suite_controller.random_suite(project.id, folder_type=False)
     test = tests_controller.add_test(project.id, suite.id, title=Faker().sentence())
 
     # Update the test

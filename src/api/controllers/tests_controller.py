@@ -50,13 +50,24 @@ class TestController(BaseController):
         Returns:
             Parsed `Test` model of the created test (from response.data).
         """
-        attrs: dict[str, object] = {"suite_id": suite_id, "title": title}
+        # Build attributes section (do not include suite reference here; it's a relationship)
+        attrs: dict[str, object] = {"title": title}
         if description:
             attrs["description"] = description
         if attributes:
+            # Avoid passing suite reference inside attributes to match API schema
+            attributes = dict(attributes)
+            attributes.pop("suite_id", None)
+            attributes.pop("suite-id", None)
             attrs.update(attributes)
 
-        payload = {"data": {"type": "test", "attributes": attrs}}
+        payload = {
+            "data": {
+                "type": "tests",
+                "attributes": attrs,
+                "relationships": {"suite": {"data": {"type": "suites", "id": suite_id}}},
+            }
+        }
         response = self._post(f"/api/{project_id}/tests", data=payload)
         return Test.model_validate(response.get("data"))
 

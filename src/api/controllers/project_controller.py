@@ -21,14 +21,6 @@ class ProjectController(BaseController):
         response = self._get(f"/api/projects/{project_id}")
         return Project.model_validate(response.get("data"))
 
-    def get_id_by_project_title(self, project_title: str) -> str:
-        """Returns project id finding a project in a projects list by title"""
-        projects_list = self.get_all()
-        for project in projects_list:
-            if project.attributes.title == project_title:
-                return project.id
-        return ""
-
     def random_project(self, with_tests: bool | None = None) -> Project:
         """Return a random project, optionaly with or without tests."""
         if self.projects == []:
@@ -38,7 +30,7 @@ class ProjectController(BaseController):
         if with_tests is None:
             return project
         elif with_tests:
-            while project.attributes.tests_count == 0:
+            while project.attributes.tests_count in (0, None):
                 project = random.choice(self.projects)
             return project
         else:
