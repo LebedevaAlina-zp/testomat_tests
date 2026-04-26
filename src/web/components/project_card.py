@@ -18,6 +18,6 @@ class ProjectCard:
     def link(self) -> Locator:
         return self.card.locator("a")
 
-    @allure.step
+    @allure.step("Open a project card")
     def open(self):
         self.link.click()

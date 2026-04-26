@@ -33,25 +33,25 @@ class LoginPageV2(BasePage):
     def success_message(self) -> WebElement:
         return self.driver.find_element(By.CSS_SELECTOR, "#content-desktop .common-flash-success")
 
-    @allure.step
+    @allure.step("Wait for the Email input to be visible")
     def email_input_visible(self) -> WebElement:
         return self.wait.for_visible((By.CSS_SELECTOR, "#content-desktop #user_email"))
 
-    @allure.step
+    @allure.step("Wait for the 'Sign In' button to be clickable")
     def sign_in_button_clickable(self) -> WebElement:
         return self.wait.for_clickable((By.CSS_SELECTOR, "#content-desktop [value='Sign In']"))
 
-    @allure.step
+    @allure.step("Open the login page")
     def open(self, base_url: str = "") -> Self:
         self.driver.get(f"{base_url}/users/sign_in")
         return self
 
-    @allure.step
+    @allure.step("Verify the login page is loaded")
     def is_loaded(self) -> Self:
         self.email_input_visible()
         return self
 
-    @allure.step
+    @allure.step("Fill the login form and press Sign In")
     def login(self, email: str, password: str, remember_me: bool = False) -> Self:
         self.email_input.clear()
         self.email_input.send_keys(email)
@@ -64,7 +64,7 @@ class LoginPageV2(BasePage):
 
         return self
 
-    @allure.step
+    @allure.step("Verify the successful sign in message is visible")
     def should_see_success_message(self) -> Self:
         self.wait.for_visible((By.CSS_SELECTOR, "#content-desktop .common-flash-success"))
         return self

@@ -37,7 +37,7 @@ class ProjectsPage(BasePage):
     def __init__(self, driver: WebDriver, configs: Config):
         super().__init__(driver, configs)
 
-    @allure.step
+    @allure.step("Open the dashboard page")
     def open(self):
         self.driver.get(self.configs.base_app_url)
         return self
@@ -51,7 +51,7 @@ class ProjectsPage(BasePage):
         self.wait.for_visible(self.TABLE_ICON)
         self.wait.for_visible(self.SEARCH_INPUT)
 
-    @allure.step
+    @allure.step("Verify the dashboard page is loaded (Free plan)")
     def is_loaded_free_plan(self):
         self._header_is_loaded()
         self.wait.for_visible(self.CREATE_COMPANY_BTN)
@@ -62,7 +62,7 @@ class ProjectsPage(BasePage):
             == "You have not created any projects yet"
         )
 
-    @allure.step
+    @allure.step("Verify the dashboard page is loaded (Enterprise plan)")
     def is_loaded_default_enterprise(self):
         self._header_is_loaded()
         assert self.find(self.CURRENT_PLAN).text == "Enterprise Plan"
@@ -72,12 +72,12 @@ class ProjectsPage(BasePage):
     def company_options(self) -> CompanyOptions:
         return CompanyOptions(qa_club_lviv="789", free_projects="")
 
-    @allure.step
+    @allure.step("Open the company dropdown")
     def click_company_dropdown(self) -> Self:
         self.driver.find_element(*self.COMPANY_DROPDOWN).click()
         return self
 
-    @allure.step
+    @allure.step("Select a company from the dropdown")
     def choose_company_in_dropdown_list(self, company: CompanyOptions) -> Self:
         self.wait.for_visible(self.COMPANY_DROPDOWN)
         self.driver.find_element(*self.COMPANY_DROPDOWN).click()

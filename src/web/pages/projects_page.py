@@ -42,12 +42,12 @@ class ProjectsPage:
         self.grid = self._root.locator("#grid")
         self.project_cards = self.grid.locator("li")
 
-    @allure.step
+    @allure.step("Open the dashboard page")
     def open(self) -> Self:
         self.page.goto("/")
         return self
 
-    @allure.step
+    @allure.step("Verify the dashboard page is loaded")
     def is_loaded(self) -> Self:
         expect(self.header.dashboard).to_be_visible()
         expect(self.header.create_project_icon).to_be_visible()
@@ -55,16 +55,15 @@ class ProjectsPage:
         expect(self.grid).to_be_visible()
         return self
 
-    @allure.step
+    @allure.step("Search a project on the dashboard page")
     def search_project(self, name: str) -> Self:
         self.search_input.fill(name, force=True)
         return self
 
-    @allure.step
+    @allure.step("Get the list of project cards")
     def get_projects(self) -> list[ProjectCard]:
         return [ProjectCard(card) for card in self.project_cards.all()]
 
-    @allure.step
     def open_project_by_name(self, name: str) -> Self:
         card = self.project_cards.filter(has_text=name).first
         ProjectCard(card).open()
@@ -74,22 +73,22 @@ class ProjectsPage:
     def company_options(self) -> CompanyOptions:
         return CompanyOptions(qa_club_lviv="789", free_projects="")
 
-    @allure.step
+    @allure.step("Verify the company selected")
     def expect_selected_company(self, name: str) -> Self:
         expect(self.company_dropdown.locator("option:checked")).to_have_text(name)
         return self
 
-    @allure.step
+    @allure.step("Verify the current subscription")
     def expect_current_subscription(self, name: str) -> Self:
         expect(self.current_subscription).to_have_text(name)
 
-    @allure.step
+    @allure.step("Select another company")
     def select_company(self, company: CompanyOptions):
         self.company_dropdown.click()
         self.company_dropdown.select_option(company)
         return self
 
-    @allure.step
+    @allure.step("Verify the successful sign in message is visible")
     def is_sign_in_successful_message_visible(self) -> Self:
         expect(self.sign_in_flash_message).to_be_visible()
         return self
