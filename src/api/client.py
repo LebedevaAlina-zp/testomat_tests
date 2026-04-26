@@ -4,6 +4,7 @@ import random
 from dataclasses import dataclass
 from typing import Any
 
+import allure
 import requests
 from requests import Response
 
@@ -51,6 +52,7 @@ class ApiClient:
     def _url(self, path: str) -> str:
         return f"{self._base_url}{path}"
 
+    @allure.step("Api authentication")
     def _authenticate(self) -> None:
         """Login and set JWT in session headers.
 
@@ -83,6 +85,7 @@ class ApiClient:
         self._jwt = token
         self._session.headers.update({"Authorization": token})
 
+    @allure.step("Get projects list with api")
     def get_projects(self) -> ProjectsResponse:
         """Get projects for the authenticated user via /api/projects.
 
@@ -123,6 +126,7 @@ class ApiClient:
                 return project.id
         return ""
 
+    @allure.step("Pick random project from projects list with api")
     def pick_random_project(self, empty: bool | None = None) -> str:
         """Pick a random project from a projects list.
         Optional empty argument to filter out either an empty project or a project with suites.
@@ -144,12 +148,14 @@ class ApiClient:
                 return project.id
         raise Exception("No projects matching the conditions was found")
 
+    @allure.step("Delete project with api")
     def delete_project(self, project_id: str) -> Response:
         """Delete a project via DELETE /api/projects/{project_id}"""
         resp = self._session.delete(self._url(f"/api/projects/{project_id}"))
         resp.raise_for_status()
         return resp
 
+    @allure.step("Get suites list with api")
     def get_suites_for_project_id(self, project_id: str) -> SuitesResponse:
         """Get suites for a project via /api/{project_id}/suites.
 
@@ -178,6 +184,7 @@ class ApiClient:
         resp = self.get_suites_for_project_id(project_id)
         return resp.data
 
+    @allure.step("Get suite by id with api")
     def get_suite_id_by_title(self, project_id: str, suite_title: str) -> str:
         """Returns suite id finding a suite in a project's suites list by title"""
         suits = self.suites_list(project_id)
@@ -186,6 +193,7 @@ class ApiClient:
                 return suite.id
         return ""
 
+    @allure.step("Delete a suite with api")
     def delete_suite(self, project_id: str, suite_id: str) -> Response:
         """Delete a suite via DELETE /api/{project_id}/suites/{suite_id}"""
         resp = self._session.delete(self._url(f"/api/{project_id}/suites/{suite_id}"))

@@ -1,6 +1,5 @@
 from typing import Self
 
-import allure
 from playwright.sync_api import Page, expect
 
 
@@ -18,7 +17,6 @@ class ProjectPageTestsTab:
         self.suites_box = self.page.locator(".suites-list-content")
         self.suite_item = self.page.locator(".node-link")
 
-    @allure.step
     def is_loaded(self) -> Self:
         expect(self.tab_name).to_have_text("Tests")
         expect(self.filter_bar_icon).to_be_visible(timeout=20000)
