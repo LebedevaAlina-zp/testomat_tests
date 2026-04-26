@@ -28,11 +28,20 @@ Playwright-based end-to-end and API testing framework for the Testomat applicati
    uv run pytest -m smoke
    ```
 
-4. Open the HTML report
+4. Generate and open the Allure report
 
    ```powershell
-   start .\test-result\report.html
+   allure generate test-result/allure-results
+   allure open allure-report
    ```
+
+   Alternatives:
+    - View Playwright traces for failed tests:
+      playwright show-trace test-result/traces/
+   ```powershell
+   playwright show-trace test-result/traces/trace_file_name.zip
+   ```
+    - View the simple HTML report instead: `start .\test-result\report.html`
 
 #### Quickstart (pip)
 
@@ -42,13 +51,27 @@ py -3.14 -m venv .venv
 pip install -e .
 python -m playwright install
 pytest -m smoke
-start .\test-result\report.html
+# Allure report (generate and open)
+allure generate test-result/allure-results
+allure open allure-report
+
 ```
+
+## Requirements
+
+- Python >= 3.14
+- Google Chrome installed (Playwright is launched with `channel="chrome"`)
+- Recommended: `uv` package manager
 
 ## Project Structure
 
 ```
 testomat_tests/
+├── .github/                           # GitHub configuration
+│   ├── workflows/                     # CI workflows (linter + tests + schedule)
+│   │   └── tests.yml                  # Main pipeline (PRs, cron, manual)
+│   └── actions/                       # Reusable composite actions
+│       └── setup/                     # Python + uv setup used by workflows
 ├── src/                               # Source code
 │   ├── api/                           # API layer (client + MVC for API tests)
 │   │   ├── client.py                  # API client (used for UI tests preconditions)
@@ -99,6 +122,7 @@ testomat_tests/
 │
 ├── test-result/                       # Test artifacts
 │   ├── report.html                    # Pytest HTML report (self-contained)
+│   ├── allure-results/                # Files for allure report
 │   ├── traces/                        # Playwright traces (on failure)
 │   └── videos/                        # Optional video recordings
 │
@@ -106,12 +130,6 @@ testomat_tests/
 ├── pyproject.toml                     # Project configuration (deps, pytest, ruff)
 └── uv.lock                            # Dependency lock file (if using uv)
 ```
-
-## Requirements
-
-- Python >= 3.14
-- Google Chrome installed (Playwright is launched with `channel="chrome"`)
-- Recommended: `uv` package manager
 
 ## Installation and Configuration
 
@@ -126,6 +144,50 @@ Notes
 - API tests use lightweight MVC: Pydantic models (`src/api/models`) + controllers (`src/api/controllers`); tests call
   controllers and validate models.
 - A minimal Selenium UI layer is included for WebDriver comparison with Playwright.
+- Allure reporting is used across the project. Failed Playwright web tests attach traces and screenshots to Allure; API
+  tests attach request/response logs.
+- GitHub Actions CI is configured to run ruff linter and test suites on pull requests and on a scheduled trigger; see
+  `.github/workflows/tests.yml`.
+- CI publishes a combined Allure report to GitHub Pages on each run. Find the deployed link in the run’s deployment
+  summary for the "github-pages" environment.
+- CI also uploads Allure results and, on Playwright failures, trace archives as workflow artifacts. These artifacts are
+  retained for 3 days and can be downloaded to generate/open reports locally.
+
+### Environment variables explained
+
+| Variable         | Used by                        | Purpose                                      |
+|------------------|--------------------------------|----------------------------------------------|
+| `BASE_URL`       | UI tests                       | Marketing site base (rarely changed)         |
+| `BASE_APP_URL`   | UI + API                       | App base, e.g. https://app.testomat.io       |
+| `EMAIL`          | UI + `ApiClient`               | Email for login + precondition API calls     |
+| `PASSWORD`       | UI + `ApiClient`               | Password for login + precondition API        |
+| `TESTOMAT_TOKEN` | Controllers-based API fixtures | Access token exchanged for a short‑lived JWT |
+
+Tip: If only running controller‑based API tests, you can omit `EMAIL`/`PASSWORD`. If only using `ApiClient`, you can
+omit `TESTOMAT_TOKEN`.
+
+### Test Markers
+
+Configured in `pyproject.toml`:
+
+- `smoke` – Quick validation tests
+- `regression` – Full test suite
+- `web` – Web UI specific tests
+- `api` – API tests
+- `slow` – Long-running tests
+- `flaky` – Flaky tests to retry on failure
+- `selenium` – UI tests using Selenium
+
+### Continuous Integration (CI)
+
+This project includes a GitHub Actions workflow that automatically lints and tests the codebase.
+
+- Triggers: on pull requests, on a nightly schedule (cron), and on manual runs (workflow_dispatch).
+- Jobs: ruff linter plus API and Web UI test suites (Playwright; Selenium subset) executed with uv.
+- Artifacts: Allure results are uploaded for each job and retained for 3 days; on Playwright failures, traces are also
+  uploaded and retained for 3 days.
+- Publishing: A combined Allure report is generated from all jobs and published to GitHub Pages.
+- Configuration: see `.github/workflows/tests.yml` and the reusable setup action in `.github/actions/setup/`.
 
 ### API Authentication
 
@@ -147,19 +209,6 @@ As a result, your `.env` should normally provide all of the following so both fl
 Optional: OpenAPI schema `testomat_api.yaml` and `tool.datamodel-codegen` settings in `pyproject.toml` allow
 regenerating
 typed Pydantic models into `src/api/models/models.py` if the API changes.
-
-### Environment variables explained
-
-| Variable         | Used by                        | Purpose                                      |
-|------------------|--------------------------------|----------------------------------------------|
-| `BASE_URL`       | UI tests                       | Marketing site base (rarely changed)         |
-| `BASE_APP_URL`   | UI + API                       | App base, e.g. https://app.testomat.io       |
-| `EMAIL`          | UI + `ApiClient`               | Email for login + precondition API calls     |
-| `PASSWORD`       | UI + `ApiClient`               | Password for login + precondition API        |
-| `TESTOMAT_TOKEN` | Controllers-based API fixtures | Access token exchanged for a short‑lived JWT |
-
-Tip: If only running controller‑based API tests, you can omit `EMAIL`/`PASSWORD`. If only using `ApiClient`, you can
-omit `TESTOMAT_TOKEN`.
 
 ### Resetting cached login state
 
@@ -210,23 +259,9 @@ BROWSER_LAUNCH_ARGS = {
 }
 ```
 
-## Test Markers
-
-Configured in `pyproject.toml`:
-
-- `smoke` – Quick validation tests
-- `regression` – Full test suite
-- `web` – Web UI specific tests
-- `api` – API tests
-- `slow` – Long-running tests
-- `flaky` – Flaky tests to retry on failure
-- `selenium` – UI tests using Selenium
-
-
+### Viewing Playwright Traces
 
 Playwright tracing is automatically started for each test and saved on failure under `test-result/traces`.
-
-### Viewing Playwright Traces
 
 Traces are saved as `.zip` archives in `test-result\traces` when a test fails, e.g.:
 
@@ -249,11 +284,6 @@ Open a trace with the Playwright Trace Viewer in either way:
   ```
 
 - In the browser: drag-and-drop the `.zip` file onto https://trace.playwright.dev
-
-Tips
-
-- If no trace file appears: ensure the test actually failed — by default this project only saves traces on failures.
-- To inspect another run, delete old zips from `test-result\traces` and re-run tests to generate fresh artifacts.
 
 ### Recording videos (optional)
 
@@ -293,16 +323,3 @@ ruff check --fix .
 # Format code
 ruff format .
 ```
-
-## Troubleshooting
-
-- Browser fails to launch: ensure Google Chrome is installed; or switch to bundled Chromium by removing `channel` from
-  `BROWSER_LAUNCH_ARGS` and running `python -m playwright install chromium`.
-- Login tests failing: verify `.env` `EMAIL`/`PASSWORD` and `BASE_APP_URL`.
-- Elements not found/timeouts: UI or selectors may have changed; inspect selectors in `src/web/pages` and
-  `src/web/components`.
-- HTML report not generated: ensure pytest ran with the default `addopts` (see `pyproject.toml`). If you override, keep
-  `--html=test-result/report.html --self-contained-html`.
-- API auth errors: use the correct flow for your test type (controllers: `TESTOMAT_TOKEN`; `ApiClient`: `EMAIL`/
-  `PASSWORD`).
-- Staging vs prod: set `BASE_APP_URL` to your env, e.g. `https://staging.app.testomat.io`.

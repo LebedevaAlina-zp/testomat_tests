@@ -123,7 +123,7 @@ jobs:
           install-playwright: 'true'
 
       - name: Run smoke tests (Playwright)
-        run: uv run pytest -n 2 -m "web and smoke and not selenium" --alluredir test-result/allure-results
+        run: uv run pytest -n 4 -m "web and smoke and not selenium" --alluredir test-result/allure-results
 
       - name: Upload Allure results (always)
         if: always()
@@ -165,7 +165,7 @@ jobs:
           install-playwright: 'true'
 
       - name: Run regression tests (Playwright)
-        run: uv run pytest -n 2 -m "web and regression and not selenium" --alluredir test-result/allure-results
+        run: uv run pytest -n 4 -m "web and regression and not selenium" --alluredir test-result/allure-results
 
       - name: Upload Allure results (always)
         if: always()
@@ -205,7 +205,7 @@ jobs:
           install-chrome: 'true'
 
       - name: Run smoke tests (Selenium)
-        run: uv run pytest -n 2 -m "smoke and selenium" --alluredir test-result/allure-results
+        run: uv run pytest -n 4 -m "smoke and selenium" --alluredir test-result/allure-results
 
       - name: Upload Allure results (always)
         if: always()
@@ -238,7 +238,7 @@ jobs:
           install-chrome: 'true'
 
       - name: Run regression tests (Selenium)
-        run: uv run pytest -n 2 -m "regression and selenium" --alluredir test-result/allure-results
+        run: uv run pytest -n 4 -m "regression and selenium" --alluredir test-result/allure-results
 
       - name: Upload Allure results (always)
         if: always()
