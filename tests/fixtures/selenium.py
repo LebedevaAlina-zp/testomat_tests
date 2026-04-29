@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.ie.webdriver import WebDriver
+from selenium.webdriver.chrome.webdriver import WebDriver
 
 from src.web.selenium.pages import LoginPage, ProjectsPage
 

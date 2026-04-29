@@ -1,8 +1,8 @@
 .idea/
 .venv/
 .env
-.tests/__pycache__/
+tests/__pycache__/
 *.pyc
-.test-result/
-.playwright/.auth
+test-result/
+playwright/.auth
 *_temp/

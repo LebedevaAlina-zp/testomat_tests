@@ -1,6 +1,9 @@
 name: Tests CI
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
   schedule:
     - cron: '30 0 * * *'
@@ -11,17 +14,18 @@ permissions:
   pages: write
   id-token: write
 
+env:
+  BASE_URL: ${{ secrets.BASE_URL }}
+  BASE_APP_URL: ${{ secrets.BASE_APP_URL }}
+  EMAIL: ${{ secrets.EMAIL }}
+  PASSWORD: ${{ secrets.PASSWORD }}
+  TESTOMAT_TOKEN: ${{ secrets.TESTOMAT_TOKEN }}
+
 jobs:
   linter:
     name: Lint (ruff)
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      BASE_URL: ${{ secrets.BASE_URL }}
-      BASE_APP_URL: ${{ secrets.BASE_APP_URL }}
-      EMAIL: ${{ secrets.EMAIL }}
-      PASSWORD: ${{ secrets.PASSWORD }}
-      TESTOMAT_TOKEN: ${{ secrets.TESTOMAT_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -47,12 +51,6 @@ jobs:
     name: Smoke - API
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      BASE_URL: ${{ secrets.BASE_URL }}
-      BASE_APP_URL: ${{ secrets.BASE_APP_URL }}
-      EMAIL: ${{ secrets.EMAIL }}
-      PASSWORD: ${{ secrets.PASSWORD }}
-      TESTOMAT_TOKEN: ${{ secrets.TESTOMAT_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -78,12 +76,6 @@ jobs:
     if: needs.smoke-api.result == 'success' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      BASE_URL: ${{ secrets.BASE_URL }}
-      BASE_APP_URL: ${{ secrets.BASE_APP_URL }}
-      EMAIL: ${{ secrets.EMAIL }}
-      PASSWORD: ${{ secrets.PASSWORD }}
-      TESTOMAT_TOKEN: ${{ secrets.TESTOMAT_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -107,12 +99,6 @@ jobs:
     name: Smoke - Web (Playwright Chromium)
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      BASE_URL: ${{ secrets.BASE_URL }}
-      BASE_APP_URL: ${{ secrets.BASE_APP_URL }}
-      EMAIL: ${{ secrets.EMAIL }}
-      PASSWORD: ${{ secrets.PASSWORD }}
-      TESTOMAT_TOKEN: ${{ secrets.TESTOMAT_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -149,12 +135,6 @@ jobs:
     if: needs.smoke-web-playwright.result == 'success' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      BASE_URL: ${{ secrets.BASE_URL }}
-      BASE_APP_URL: ${{ secrets.BASE_APP_URL }}
-      EMAIL: ${{ secrets.EMAIL }}
-      PASSWORD: ${{ secrets.PASSWORD }}
-      TESTOMAT_TOKEN: ${{ secrets.TESTOMAT_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -189,12 +169,6 @@ jobs:
     name: Smoke - Web (Selenium)
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      BASE_URL: ${{ secrets.BASE_URL }}
-      BASE_APP_URL: ${{ secrets.BASE_APP_URL }}
-      EMAIL: ${{ secrets.EMAIL }}
-      PASSWORD: ${{ secrets.PASSWORD }}
-      TESTOMAT_TOKEN: ${{ secrets.TESTOMAT_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -222,12 +196,6 @@ jobs:
     if: needs.smoke-web-selenium.result == 'success' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      BASE_URL: ${{ secrets.BASE_URL }}
-      BASE_APP_URL: ${{ secrets.BASE_APP_URL }}
-      EMAIL: ${{ secrets.EMAIL }}
-      PASSWORD: ${{ secrets.PASSWORD }}
-      TESTOMAT_TOKEN: ${{ secrets.TESTOMAT_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
